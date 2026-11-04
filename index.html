@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Challenges">
+<meta name="theme-color" content="#E4F0FA">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}</style>
+<title>Challenge Quest</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800;900&display=swap">
+<style>
+/* Layout: one chunky column — star tally, category stickers, a giant press-down button, then the challenge card (and a paper sheet for printables). */
+:root {
+  --bg: #E4F0FA;
+  --surface: #FFFFFF;
+  --ink: #13294B;
+  --ink-soft: #33476B;
+  --line: #13294B;
+  --btn: #C8361F;
+  --btn-deep: #82200F;
+  --btn-ink: #FFFFFF;
+  --yes: #127552;
+  --sun: #FFC83D;
+  --c-move: #C8361F;
+  --c-make: #5B3FC4;
+  --c-brain: #1764B0;
+  --c-explore: #127552;
+  --c-kind: #B02A6A;
+  --c-print: #A15600;
+  --chip-bg: #FFFFFF;
+  --paper: #FFFFFF;
+  --paper-ink: #111111;
+  --paper-soft: #666666;
+  --display: "Lilita One", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Nunito", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --radius: 22px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1B2E; --surface: #182842; --ink: #EAF2FF; --ink-soft: #C9D6EC; --line: #EAF2FF;
+    --chip-bg: #182842;
+    --c-move: #FF7A63; --c-make: #A28CFF; --c-brain: #5CAEFF; --c-explore: #3FCB9D; --c-kind: #FF7DB6; --c-print: #FFAA3D;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1B2E; --surface: #182842; --ink: #EAF2FF; --ink-soft: #C9D6EC; --line: #EAF2FF;
+  --chip-bg: #182842;
+  --c-move: #FF7A63; --c-make: #A28CFF; --c-brain: #5CAEFF; --c-explore: #3FCB9D; --c-kind: #FF7DB6; --c-print: #FFAA3D;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-weight: 600; font-size: 17px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 48px;
+}
+.wrap { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, .chip:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+
+header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 7vw, 2.8rem); line-height: 1; margin: 0; letter-spacing: .5px; }
+h1 span { color: var(--btn); }
+.stars { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 3px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 8px; box-shadow: 3px 3px 0 var(--line); }
+.stars .big { font-family: var(--display); font-size: 1.5rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.stars small { display: block; font-size: .78rem; color: var(--ink-soft); line-height: 1.2; }
+.stars svg { width: 34px; height: 34px; flex: none; }
+.bar { height: 6px; background: color-mix(in srgb, var(--ink) 15%, transparent); border-radius: 9px; margin-top: 3px; width: 110px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--sun); border-radius: 9px; transition: width .4s; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 3px solid var(--line); background: var(--chip-bg); border-radius: 999px; padding: 6px 14px 6px 10px; font-weight: 800; font-size: .95rem; }
+.chip svg { width: 20px; height: 20px; }
+.chip svg { stroke: var(--cc); }
+.chip[aria-pressed="true"] { background: color-mix(in srgb, var(--cc) 22%, var(--surface)); color: var(--ink); border-color: var(--cc); box-shadow: 3px 3px 0 var(--line); }
+
+.go {
+  font-family: var(--display); font-size: clamp(1.7rem, 7vw, 2.4rem); letter-spacing: .5px;
+  background: var(--btn); color: var(--btn-ink); border: 3px solid var(--line); border-radius: var(--radius);
+  padding: 22px 20px; box-shadow: 0 9px 0 var(--btn-deep), 0 9px 0 3px var(--line);
+  transform: translateY(0); transition: transform .08s, box-shadow .08s; width: 100%;
+}
+.go:hover { filter: brightness(1.05); }
+.go:active { transform: translateY(7px); box-shadow: 0 2px 0 var(--btn-deep), 0 2px 0 3px var(--line); }
+
+.card { background: var(--surface); border: 3px solid var(--line); border-radius: var(--radius); box-shadow: 6px 6px 0 var(--line); padding: 22px 22px 20px; display: flex; flex-direction: column; gap: 14px; position: relative; }
+.card.spin .card-body { opacity: .55; }
+.badge { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; background: color-mix(in srgb, var(--cc) 14%, var(--surface)); color: var(--ink); border: 2px solid var(--cc); border-radius: 999px; padding: 4px 12px 4px 8px; font-weight: 900; font-size: .9rem; text-transform: uppercase; letter-spacing: 1px; }
+.badge svg { width: 18px; height: 18px; stroke: var(--cc); }
+.card h2 { font-family: var(--display); font-weight: 400; font-size: clamp(1.7rem, 6vw, 2.3rem); line-height: 1.1; margin: 0; text-wrap: balance; }
+.card-body { display: flex; flex-direction: column; gap: 10px; }
+.card p { margin: 0; font-size: 1.2rem; max-width: 60ch; }
+.need { color: var(--ink-soft); font-size: 1rem !important; }
+.need b { color: var(--ink); }
+.answer { background: color-mix(in srgb, var(--sun) 30%, var(--surface)); border: 2px dashed var(--line); border-radius: 14px; padding: 10px 14px; font-weight: 800; font-size: 1.15rem; }
+.timer { font-family: var(--display); font-size: clamp(3rem, 16vw, 5rem); line-height: 1; text-align: center; font-variant-numeric: tabular-nums; color: var(--cc); }
+.timer.done { animation: pulse .5s 3; }
+@keyframes pulse { 50% { transform: scale(1.12); } }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; border: 3px solid var(--line); background: var(--surface); border-radius: 14px; padding: 10px 16px; font-weight: 800; font-size: 1rem; box-shadow: 0 4px 0 var(--line); transition: transform .08s, box-shadow .08s; }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--line); }
+.btn svg { width: 20px; height: 20px; }
+.btn.yes { background: var(--yes); color: #fff; }
+.btn.yes svg { stroke: #fff; }
+.cheer { font-family: var(--display); font-size: 1.4rem; color: var(--c-explore); margin: 0; }
+.card p, .card h2 { color: var(--ink); }
+
+svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Printable sheet: always paper-white, both themes */
+#printArea { display: flex; flex-direction: column; gap: 12px; }
+.sheet-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.hint { font-size: .9rem; color: var(--ink-soft); max-width: 60ch; margin: 0; }
+.sheet { background: var(--paper); color: var(--paper-ink); border: 3px solid var(--line); border-radius: 6px; padding: 28px 24px; box-shadow: 6px 6px 0 var(--line); font-family: var(--body); overflow-x: auto; }
+.sheet .sh-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: .85rem; color: var(--paper-soft); border-bottom: 2px solid var(--paper-ink); padding-bottom: 8px; margin-bottom: 14px; }
+.sheet h3 { font-family: var(--display); font-weight: 400; font-size: 2rem; margin: 0 0 4px; color: var(--paper-ink); }
+.sheet .sub { margin: 0 0 16px; font-size: 1.05rem; }
+.sheet svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+.ws { border-collapse: collapse; margin: 0 auto; }
+.ws td { width: 2.3em; height: 2.3em; text-align: center; font-weight: 900; font-size: 1.15rem; border: 1px solid #bbb; color: var(--paper-ink); }
+.wordlist { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: center; margin-top: 16px; font-weight: 800; font-size: 1.1rem; }
+.box { display: inline-block; width: 1em; height: 1em; border: 2px solid var(--paper-ink); border-radius: 3px; vertical-align: -2px; margin-right: 6px; }
+.sums { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 30px; font-size: 1.6rem; font-weight: 900; max-width: 520px; margin: 0 auto; font-variant-numeric: tabular-nums; }
+.sums div { white-space: nowrap; }
+.blank { display: inline-block; width: 2.4em; border-bottom: 3px solid var(--paper-ink); height: 1em; vertical-align: -4px; }
+.key { margin-top: 18px; font-size: .75rem; color: var(--paper-soft); transform: rotate(180deg); text-align: center; }
+.hunt { list-style: none; padding: 0; margin: 0 auto; max-width: 480px; display: flex; flex-direction: column; gap: 14px; font-size: 1.3rem; font-weight: 800; }
+.hunt .box { width: 1.2em; height: 1.2em; }
+.code-key { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 4px; margin: 0 auto 22px; max-width: 560px; }
+.code-key div { border: 2px solid var(--paper-ink); border-radius: 6px; text-align: center; font-weight: 900; padding: 2px 0; line-height: 1.2; }
+.code-key small { display: block; color: var(--paper-soft); font-size: .8rem; }
+.code-msg { display: flex; flex-wrap: wrap; gap: 10px 26px; justify-content: center; }
+.code-word { display: flex; gap: 6px; }
+.code-word div { text-align: center; font-weight: 900; font-size: 1.1rem; }
+.code-word span { display: block; width: 2.1em; height: 2.4em; border-bottom: 3px solid var(--paper-ink); }
+.write-line { margin-top: 18px; font-size: 1.2rem; font-weight: 800; }
+.write-line i { display: inline-block; width: 60%; border-bottom: 3px solid var(--paper-ink); }
+
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; width: 100%; height: 100%; }
+
+@media (max-width: 480px) {
+  .card { padding: 18px 16px; }
+  .sheet { padding: 18px 12px; }
+  .ws td { width: 1.9em; height: 1.9em; font-size: 1rem; }
+  .sums { font-size: 1.3rem; gap: 18px 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .go, .btn, .bar i { transition: none; }
+  .timer.done { animation: none; }
+}
+@media print {
+  :root { padding: 0 !important; }
+  body { background: #fff; padding: 0 !important; }
+  .wrap > *:not(#printArea), .sheet-actions, .hint, #confetti { display: none !important; }
+  #printArea { display: block !important; }
+  .sheet { border: none; box-shadow: none; padding: 0; overflow: visible; }
+  @page { margin: 14mm; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Challenge <span>Quest</span></h1>
+    <div class="stars" title="Stars earned">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z" fill="#FFC83D" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      <div>
+        <span class="big" id="starCount">0</span>
+        <small id="levelName">Rookie</small>
+        <div class="bar"><i id="levelBar" style="width:0%"></i></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="chips" id="chips" role="group" aria-label="Pick a kind of challenge"></div>
+
+  <button class="go" id="go">Give me a challenge!</button>
+
+  <section class="card" id="card" aria-live="polite">
+    <div class="badge" id="badge"></div>
+    <div class="card-body">
+      <h2 id="cTitle"></h2>
+      <p id="cText"></p>
+      <p class="need" id="cNeed" hidden></p>
+      <div class="answer" id="cAnswer" hidden></div>
+    </div>
+    <div class="timer" id="timer" hidden>0:30</div>
+    <p class="cheer" id="cheer" hidden></p>
+    <div class="actions">
+      <button class="btn" id="readBtn"><svg class="i" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>Read it to me</button>
+      <button class="btn" id="timerBtn" hidden><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span>Start timer</span></button>
+      <button class="btn" id="answerBtn" hidden><svg class="i" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Show answer</button>
+      <button class="btn yes" id="doneBtn"><svg class="i" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>I did it!</button>
+    </div>
+  </section>
+
+  <section id="printArea" hidden>
+    <div class="sheet-actions">
+      <button class="btn" id="printBtn"><svg class="i" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2"/><path d="M6 14h12v7H6z"/></svg>Print this sheet</button>
+      <button class="btn" id="newSheetBtn"><svg class="i" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>Make a different one</button>
+    </div>
+    <p class="hint" id="printHint" hidden>Printing is switched off in this online view. To print, open <b>challenge-quest.html</b> from your Google Drive “Activity Challenge” folder in Chrome or Safari, then press Print.</p>
+    <div class="sheet" id="sheet"></div>
+  </section>
+</div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const R = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = R(0, i); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem('cq-' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem('cq-' + k, JSON.stringify(v)); } catch (e) {} }
+  };
+
+  const ICON = {
+    all: '<path d="M12 3l2.2 5.6L20 9l-4.5 3.8L17 19l-5-3.2L7 19l1.5-6.2L4 9l5.8-.4z"/>',
+    move: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+    make: '<path d="M4 20l4-1L19 8l-3-3L5 16z"/><path d="M14 7l3 3"/>',
+    brain: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+    explore: '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l6 6"/>',
+    kind: '<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>',
+    print: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>'
+  };
+  const svgI = k => '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + ICON[k] + '</svg>';
+  const CATS = {
+    all: { label: 'Anything', color: 'var(--ink)' },
+    move: { label: 'Move', color: 'var(--c-move)' },
+    make: { label: 'Make', color: 'var(--c-make)' },
+    brain: { label: 'Think', color: 'var(--c-brain)' },
+    explore: { label: 'Explore', color: 'var(--c-explore)' },
+    kind: { label: 'Kind', color: 'var(--c-kind)' },
+    print: { label: 'Print', color: 'var(--c-print)' }
+  };
+
+  const ANIMALS = ['penguin', 'kangaroo', 'flamingo', 'frog', 'crab', 'snake', 'elephant', 'bunny', 'monkey', 'emu', 'koala', 'chicken', 'dinosaur', 'cat'];
+  const THINGS = ['magic key', 'giant egg', 'talking shoe', 'treasure map', 'tiny dragon', 'flying sock', 'golden banana', 'robot'];
+  const RIDDLES = [
+    ['What has hands but can’t clap?', 'A clock!'],
+    ['What gets wetter the more it dries?', 'A towel!'],
+    ['What has a neck but no head?', 'A bottle!'],
+    ['What has legs but can’t walk?', 'A table (or a chair)!'],
+    ['What can you catch but not throw?', 'A cold!'],
+    ['What has teeth but can’t bite?', 'A comb!'],
+    ['What goes up but never comes down?', 'Your age!'],
+    ['What kind of room has no doors or windows?', 'A mushroom!'],
+    ['What building has the most stories?', 'A library!'],
+    ['What has one eye but can’t see?', 'A needle!'],
+    ['What is full of holes but still holds water?', 'A sponge!'],
+    ['What has a bottom at the top?', 'Your legs!'],
+    ['What has four wheels and flies?', 'A rubbish truck!']
+  ];
+  const LISTS = ['animals that live in the ocean', 'things that are red', 'fruits', 'things with wheels', 'animals that can fly', 'things you find in a kitchen', 'things that are cold', 'farm animals', 'things that are round', 'Australian animals'];
+  const RHYME = ['cat', 'bug', 'hat', 'sun', 'bee', 'cake', 'frog', 'star', 'bed', 'king'];
+  const TWISTERS = ['Red lorry, yellow lorry', 'She sells sea shells by the sea shore', 'Six slippery snails slid slowly seaward', 'Fresh French fried fish', 'Big black bugs bleed blue blood', 'Kitty caught the kitten in the kitchen'];
+  const LETTERS = 'ABCDEFGHIJKLMNOPRSTW'.split('');
+  const COUNTERS = ['doors', 'windows', 'chairs', 'lights', 'beds', 'taps'];
+
+  // Challenge pool. Each item is an object or a function that returns one.
+  const POOL = [
+    // MOVE
+    () => { const n = R(10, 25); return { cat: 'move', title: n + ' star jumps!', text: 'Do ' + n + ' star jumps. Count every one out loud.' }; },
+    () => { const n = R(8, 15); return { cat: 'move', title: 'Hop it', text: 'Hop ' + n + ' times on your left foot, then ' + n + ' times on your right foot.' }; },
+    { cat: 'move', title: 'Freeze dance', text: 'Put on a song and dance like crazy. When your grown-up says FREEZE, stop like a statue!', need: 'music and a grown-up', timer: 60 },
+    { cat: 'move', title: 'Bear walk', text: 'Walk on your hands and feet like a bear, all the way across the room and back.' },
+    { cat: 'move', title: 'Crab walk race', text: 'Sit down, lift your bottom up, and crab walk from one wall to the other. Can you beat your grown-up?' },
+    { cat: 'move', title: 'Flamingo balance', text: 'Stand on one foot like a flamingo. Can you stay still until the timer ends?', timer: 20 },
+    { cat: 'move', title: 'The floor is lava!', text: 'Get from one side of the room to the other without touching the floor. Use cushions as stepping stones.', need: 'cushions or pillows' },
+    () => { const n = R(5, 10); return { cat: 'move', title: 'Frog jumps', text: 'Squat down low and do ' + n + ' big frog jumps. Ribbit after each one!' }; },
+    { cat: 'move', title: 'Sock basketball', text: 'Roll up some socks into balls. Take 3 big steps back from a basket. Can you get 5 in?', need: 'socks and a basket or box' },
+    () => { const a = shuffle(ANIMALS).slice(0, 3); return { cat: 'move', title: 'Animal parade', text: 'Move across the room like a ' + a[0] + ', then a ' + a[1] + ', then a ' + a[2] + '.' }; },
+    { cat: 'move', title: 'Strong table', text: 'Hold a plank (keep your body straight like a table) until the timer ends.', timer: 20 },
+    { cat: 'move', title: 'Super speed', text: 'Run on the spot as fast as you can until the timer ends. Knees up high!', timer: 30 },
+    { cat: 'move', title: 'Balancing act', text: 'Put a soft toy on your head and walk all the way across the room without it falling off.', need: 'a soft toy' },
+    { cat: 'move', title: 'Balloon keepy-uppy', text: 'Keep a balloon in the air. Don’t let it touch the floor until the timer ends!', need: 'a balloon', timer: 30 },
+    { cat: 'move', title: 'Mirror me', text: 'Stand facing your grown-up. Copy every move they make, like a mirror.', need: 'a grown-up', timer: 60 },
+    { cat: 'move', title: 'Body letters', text: 'Make the letters T, Y, C and O with your whole body. Can you make the first letter of your name?' },
+    { cat: 'move', title: 'Obstacle course', text: 'Build an obstacle course with 5 things to go over, under and around. Then time how fast you can do it.', need: 'cushions, chairs, blankets' },
+    { cat: 'move', title: 'Tree pose', text: 'Stand on one leg and put your other foot on your leg. Hands up like branches. Hold it, then swap legs.', timer: 15 },
+    () => { const n = R(10, 20); return { cat: 'move', title: 'Pillow jumps', text: 'Jump over a pillow ' + n + ' times without touching it.', need: 'a pillow' }; },
+    { cat: 'move', title: 'Slow-motion race', text: 'Have a race with your grown-up, but everyone has to move in super slow motion. The slowest wins!' },
+
+    // MAKE
+    { cat: 'make', title: 'Tallest tower', text: 'Build the tallest tower you can before the timer ends. Does it stand up by itself?', need: 'blocks, Lego or cups', timer: 180 },
+    { cat: 'make', title: 'Paper plane test', text: 'Fold a paper plane and throw it. Count how many steps it flew. Can you change it to fly further?', need: 'a sheet of paper' },
+    { cat: 'make', title: 'Build a fort', text: 'Make a cubby house with blankets and chairs. It must be big enough for you and one toy.', need: 'blankets, chairs, pegs' },
+    () => { const e = R(3, 7), l = R(2, 8); return { cat: 'make', title: 'Draw a monster', text: 'Draw a monster with ' + e + ' eyes and ' + l + ' legs. Give it a name and tell someone what it eats.', need: 'paper and pencils' }; },
+    { cat: 'make', title: 'Breakfast song', text: 'Make up a song about what you had for breakfast. Sing it to someone!' },
+    { cat: 'make', title: 'Float a boat', text: 'Make a boat from foil or paper. Does it float in the sink? How many coins or Lego bricks can it carry?', need: 'foil, water, coins or Lego' },
+    { cat: 'make', title: 'Superhero family', text: 'Draw everyone in your family as superheroes. What is each person’s super power?', need: 'paper and pencils' },
+    { cat: 'make', title: 'Puppet show', text: 'Make a puppet from a sock or paper bag. Put on a short show for your family.', need: 'a sock or paper bag, textas' },
+    () => { const a = shuffle(ANIMALS).slice(0, 2); return { cat: 'make', title: 'Mix-up animal', text: 'Invent a new animal that is half ' + a[0] + ' and half ' + a[1] + '. Draw it and give it a name.', need: 'paper and pencils' }; },
+    { cat: 'make', title: 'Bedroom flag', text: 'Design a flag for your bedroom. Use your favourite colours and a picture of something you love.', need: 'paper and pencils' },
+    { cat: 'make', title: 'Make a crown', text: 'Make a crown or a hat from paper. Wear it for the rest of the day!', need: 'paper, tape, scissors' },
+    { cat: 'make', title: 'Toy house', text: 'Turn a box into a house for one of your toys. Add a door and a window.', need: 'a box, textas, scissors' },
+    () => ({ cat: 'make', title: 'Comic strip', text: 'Draw a 3-picture comic about a ' + pick(THINGS) + '. What happens first, next and last?', need: 'paper and pencils' }),
+    { cat: 'make', title: 'Pattern maker', text: 'Make a pattern on the floor with 12 things from around the house. Like: spoon, sock, spoon, sock…' },
+    { cat: 'make', title: 'Lego car ramp', text: 'Build a car and a ramp. Whose car rolls the furthest?', need: 'Lego and a book or board for a ramp' },
+
+    // THINK
+    () => { const n = R(15, 30); return { cat: 'brain', title: 'Count down', text: 'Count backwards from ' + n + ' all the way to zero. Then shout BLAST OFF!' }; },
+    () => ({ cat: 'brain', title: 'Quick list', text: 'Name 5 ' + pick(LISTS) + ' before the timer runs out.', timer: 30 }),
+    { cat: 'brain', title: 'Backwards name', text: 'Spell your name backwards. Then try it with someone else’s name.' },
+    { cat: 'brain', title: 'Name hunt', text: 'Find something in the house that starts with each letter of your name.' },
+    { cat: 'brain', title: 'I spy', text: 'Play 3 rounds of I spy with your grown-up. You go first!', need: 'a grown-up' },
+    { cat: 'brain', title: 'Memory tray', text: 'Ask a grown-up to put 6 things on a tray. Look for 20 seconds. Close your eyes while they take one away. Which one is missing?', need: 'a tray and 6 small things', timer: 20 },
+    () => { const r = pick(RIDDLES); return { cat: 'brain', title: 'Riddle time', text: r[0], answer: r[1] }; },
+    () => {
+      const qs = []; for (let i = 0; i < 3; i++) { if (Math.random() < .55) { const a = R(2, 10), b = R(1, 10); qs.push([a + ' + ' + b, a + b]); } else { const a = R(5, 15), b = R(1, a); qs.push([a + ' − ' + b, a - b]); } }
+      return { cat: 'brain', title: 'Number crunch', text: 'Work these out. Use your fingers or toys to help: ' + qs.map(q => q[0] + ' = ?').join('   '), answer: qs.map(q => q[0] + ' = ' + q[1]).join(',   ') };
+    },
+    () => { const w = pick(RHYME); return { cat: 'brain', title: 'Rhyme it', text: 'Think of 5 words that rhyme with “' + w + '”.', timer: 60 }; },
+    () => ({ cat: 'brain', title: 'Story starter', text: 'Tell a story that begins: “Once upon a time, a ' + pick(ANIMALS) + ' found a ' + pick(THINGS) + '…” What happens next?' }),
+    { cat: 'brain', title: 'Colour sort', text: 'Sort your toys (or the sock basket) into groups by colour. Which colour has the most?' },
+    () => { const c = pick(COUNTERS); return { cat: 'brain', title: 'Guess and count', text: 'Guess how many ' + c + ' are in your house. Then go and count them. How close were you?' }; },
+    () => ({ cat: 'brain', title: 'Tongue twister', text: 'Say this 3 times, fast: “' + pick(TWISTERS) + '”' }),
+    { cat: 'brain', title: 'What am I?', text: 'Think of an animal. Give your grown-up clues (but don’t say its name!) until they guess it.', need: 'a grown-up' },
+
+    // EXPLORE
+    { cat: 'explore', title: 'Leaf line-up', text: 'Find 5 different leaves. Line them up from smallest to biggest.' },
+    { cat: 'explore', title: 'Rainbow hunt', text: 'Find something red, orange, yellow, green, blue and purple. Put them in rainbow order.' },
+    { cat: 'explore', title: 'Bug spotter', text: 'Look for 3 different creepy crawlies outside. Look closely, but don’t touch!' },
+    { cat: 'explore', title: 'Cloud animals', text: 'Lie down and look at the clouds. Can you find one that looks like an animal?' },
+    { cat: 'explore', title: 'Rock friend', text: 'Find a rock. Give it a face and a name. Where will it live?', need: 'textas or chalk' },
+    { cat: 'explore', title: 'Listening ears', text: 'Sit outside, close your eyes and listen. Count how many different sounds you hear.', timer: 60 },
+    { cat: 'explore', title: 'Sniff hunt', text: 'Find 3 things that smell nice and 1 thing that smells yucky.' },
+    { cat: 'explore', title: 'Feel hunt', text: 'Find something soft, something rough, something smooth, something bumpy and something squishy.' },
+    () => { const l = pick(LETTERS); return { cat: 'explore', title: 'Letter ' + l + ' hunt', text: 'Find 3 things that start with the letter ' + l + '.' }; },
+    { cat: 'explore', title: 'Fairy house', text: 'Build a tiny house for a fairy or a bug using sticks, leaves and stones.' },
+    { cat: 'explore', title: 'Bird counter', text: 'Watch the sky and the trees. How many birds can you spot before the timer ends?', timer: 120 },
+    { cat: 'explore', title: 'Shadow play', text: 'On a sunny day, make your shadow tiny, then giant. Can you make a shadow animal with your hands?' },
+    { cat: 'explore', title: 'Chalk trace', text: 'Lie down on the path and get a grown-up to trace around you with chalk. Then draw your clothes on!', need: 'chalk and a grown-up' },
+
+    // KIND
+    { cat: 'kind', title: 'Compliment hero', text: 'Give 3 people in your family a nice compliment. Like: “You are really good at…”' },
+    { cat: 'kind', title: 'Love card', text: 'Draw a card for someone you love and give it to them.', need: 'paper and pencils' },
+    { cat: 'kind', title: 'Table helper', text: 'Help set the table for dinner tonight. Don’t forget the forks!' },
+    { cat: 'kind', title: 'Tidy race', text: 'Tidy your room as fast as you can before the timer ends. Ready, set, GO!', timer: 300 },
+    { cat: 'kind', title: 'Thank you hug', text: 'Give someone a big hug and tell them one thing you are thankful for.' },
+    { cat: 'kind', title: 'Neat bed', text: 'Make your bed super neat. Pillow fluffed, toys lined up.' },
+    { cat: 'kind', title: 'Call Grandma or Grandpa', text: 'Call or visit a grandparent (or someone special) and tell them the best part of your day.' },
+    { cat: 'kind', title: 'Secret helper', text: 'Do something nice for someone in secret. Don’t tell them it was you!' },
+    { cat: 'kind', title: 'Sock matcher', text: 'Help match all the socks from the washing into pairs.' },
+    { cat: 'kind', title: 'Pet helper', text: 'Help feed or look after a pet. Or draw a picture of a pet you would love to have.' },
+
+    // PRINT
+    { cat: 'print', title: 'Maze escape', text: 'Help the bee find the flower. Start at the top, finish at the bottom. Use a pencil!', sheet: 'maze' },
+    { cat: 'print', title: 'Word search', text: 'Find all the hidden words. They go across or down. Tick each one when you find it.', sheet: 'words' },
+    { cat: 'print', title: 'Maths mission', text: 'Solve all 12 sums. Check your answers with a grown-up.', sheet: 'sums' },
+    { cat: 'print', title: 'Scavenger hunt', text: 'Take this list around the house or garden. Tick each thing when you find it.', sheet: 'hunt' },
+    { cat: 'print', title: 'Secret code', text: 'Use the code key to crack the secret message. A is 1, B is 2…', sheet: 'code' },
+    { cat: 'print', title: 'Squiggle art', text: 'Turn this squiggle into a picture. A dog? A rocket? You decide!', sheet: 'squiggle' },
+    { cat: 'print', title: 'Dots and boxes', text: 'Play with a grown-up. Take turns joining two dots. If you close a box, write your initial in it and go again.', sheet: 'dots' }
+  ];
+
+  // ---------- printable sheets ----------
+  const sheetTop = () => '<div class="sh-top"><span>Challenge Quest</span><span>Name: ______________ &nbsp; Date: __________</span></div>';
+
+  function mazeSVG() {
+    const w = R(0, 1) ? 9 : 11, h = w === 9 ? 11 : 13, S = 40, P = 30;
+    const cells = Array.from({ length: w * h }, () => ({ n: 1, e: 1, s: 1, w: 1, v: 0 }));
+    const st = [0]; cells[0].v = 1;
+    while (st.length) {
+      const i = st[st.length - 1], x = i % w, y = (i / w) | 0, nb = [];
+      if (y > 0 && !cells[i - w].v) nb.push(['n', i - w, 's']);
+      if (x < w - 1 && !cells[i + 1].v) nb.push(['e', i + 1, 'w']);
+      if (y < h - 1 && !cells[i + w].v) nb.push(['s', i + w, 'n']);
+      if (x > 0 && !cells[i - 1].v) nb.push(['w', i - 1, 'e']);
+      if (!nb.length) { st.pop(); continue; }
+      const [d, j, o] = pick(nb); cells[i][d] = 0; cells[j][o] = 0; cells[j].v = 1; st.push(j);
+    }
+    cells[0].n = 0; cells[w * h - 1].s = 0;
+    let d = '';
+    cells.forEach((c, i) => {
+      const x = P + (i % w) * S, y = P + ((i / w) | 0) * S;
+      if (c.n) d += 'M' + x + ' ' + y + 'h' + S;
+      if (c.w) d += 'M' + x + ' ' + y + 'v' + S;
+      if ((i % w) === w - 1 && c.e) d += 'M' + (x + S) + ' ' + y + 'v' + S;
+      if (((i / w) | 0) === h - 1 && c.s) d += 'M' + x + ' ' + (y + S) + 'h' + S;
+    });
+    const W = w * S + P * 2, H = h * S + P * 2, ex = P + (w - 1) * S + S / 2, ey = P + h * S;
+    const bee = '<g transform="translate(' + (P + S / 2) + ',' + (P - 14) + ')"><ellipse rx="11" ry="8" fill="#FFC83D" stroke="#111" stroke-width="2"/><path d="M-3-7v14M3-7v14" stroke="#111" stroke-width="2.5"/><ellipse cx="-4" cy="-11" rx="5" ry="4" fill="#fff" stroke="#111" stroke-width="1.5"/><ellipse cx="4" cy="-11" rx="5" ry="4" fill="#fff" stroke="#111" stroke-width="1.5"/></g>';
+    let petals = ''; for (let k = 0; k < 6; k++) { const a = k * Math.PI / 3; petals += '<circle cx="' + (Math.cos(a) * 8).toFixed(1) + '" cy="' + (Math.sin(a) * 8).toFixed(1) + '" r="6" fill="#F7A8C8" stroke="#111" stroke-width="1.5"/>'; }
+    const flower = '<g transform="translate(' + ex + ',' + (ey + 16) + ')">' + petals + '<circle r="5" fill="#FFC83D" stroke="#111" stroke-width="1.5"/></g>';
+    return '<svg viewBox="0 0 ' + W + ' ' + (H + 6) + '" width="' + W + '" role="img" aria-label="Maze"><path d="' + d + '" stroke="#111" stroke-width="4" stroke-linecap="square" fill="none"/>' + bee + flower + '</svg>';
+  }
+
+  const WORDS = {
+    Animals: ['CAT', 'DOG', 'FROG', 'LION', 'DUCK', 'BEAR', 'KOALA', 'ZEBRA', 'HORSE', 'WOMBAT', 'EMU', 'SNAKE'],
+    Space: ['SUN', 'MOON', 'STAR', 'ROCKET', 'PLANET', 'COMET', 'ALIEN', 'ORBIT', 'EARTH', 'MARS'],
+    Ocean: ['FISH', 'WHALE', 'CRAB', 'SHARK', 'WAVE', 'SHELL', 'SAND', 'OCTOPUS', 'SEAL', 'BOAT'],
+    Food: ['APPLE', 'PIZZA', 'BREAD', 'MILK', 'EGG', 'CAKE', 'PEAR', 'RICE', 'BANANA', 'CHEESE']
+  };
+  function wordSearch() {
+    const theme = pick(Object.keys(WORDS)), N = 9;
+    for (let attempt = 0; attempt < 50; attempt++) {
+      const words = shuffle(WORDS[theme]).slice(0, 7).sort((a, b) => b.length - a.length);
+      const g = Array.from({ length: N }, () => Array(N).fill(''));
+      let ok = true;
+      for (const word of words) {
+        let placed = false;
+        for (let t = 0; t < 200 && !placed; t++) {
+          const down = Math.random() < .5, r = R(0, down ? N - word.length : N - 1), c = R(0, down ? N - 1 : N - word.length);
+          let fits = true;
+          for (let k = 0; k < word.length; k++) { const ch = g[down ? r + k : r][down ? c : c + k]; if (ch && ch !== word[k]) { fits = false; break; } }
+          if (fits) { for (let k = 0; k < word.length; k++) g[down ? r + k : r][down ? c : c + k] = word[k]; placed = true; }
+        }
+        if (!placed) { ok = false; break; }
+      }
+      if (!ok) continue;
+      const AZ = 'ABCDEFGHIJKLMNOPRSTUWY';
+      const rows = g.map(row => '<tr>' + row.map(ch => '<td>' + (ch || AZ[R(0, AZ.length - 1)]) + '</td>').join('') + '</tr>').join('');
+      return { title: theme + ' word search', html: '<table class="ws">' + rows + '</table><div class="wordlist">' + words.slice().sort().map(w => '<span><i class="box"></i>' + w + '</span>').join('') + '</div>' };
+    }
+    return wordSearch();
+  }
+
+  function sumsSheet() {
+    const qs = [];
+    for (let i = 0; i < 12; i++) {
+      if (i % 2 === 0) { const a = R(1, 12), b = R(1, 20 - a); qs.push([a + ' + ' + b, a + b]); }
+      else { const a = R(6, 20), b = R(1, a - 1); qs.push([a + ' − ' + b, a - b]); }
+    }
+    return { title: 'Maths mission', html: '<div class="sums">' + qs.map(q => '<div>' + q[0] + ' = <span class="blank"></span></div>').join('') + '</div><div class="key">Answers for grown-ups: ' + qs.map((q, i) => (i + 1) + ') ' + q[1]).join('  ') + '</div>' };
+  }
+
+  const HUNT = ['something red', 'a leaf', 'a spoon', 'something soft', 'something round', 'a book with an animal on the cover', 'something smaller than your thumb', 'an odd sock', 'something that makes a noise', 'something blue', 'a rock', 'something shiny', 'something that starts with B', 'a feather', 'something square', 'a toy with wheels', 'something that smells nice', 'something bumpy', 'a stick longer than your arm', 'something yellow', 'a flower', 'something with buttons'];
+  const huntSheet = () => ({ title: 'Scavenger hunt', html: '<ul class="hunt">' + shuffle(HUNT).slice(0, 10).map(h => '<li><i class="box"></i>Find ' + h + '</li>').join('') + '</ul>' });
+
+  const MESSAGES = ['YOU ARE A STAR', 'TIME FOR A DANCE', 'GIVE DAD A HIGH FIVE', 'GIVE MUM A HUG', 'YOU ROCK', 'HAVE A GREAT DAY', 'I LOVE YOU', 'DO TEN STAR JUMPS', 'BE A ROBOT FOR ONE MINUTE', 'TELL A JOKE'];
+  function codeSheet() {
+    const msg = pick(MESSAGES), A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const key = A.split('').map((l, i) => '<div>' + l + '<small>' + (i + 1) + '</small></div>').join('');
+    const words = msg.split(' ').map(w => '<div class="code-word">' + w.split('').map(l => '<div>' + (A.indexOf(l) + 1) + '<span></span></div>').join('') + '</div>').join('');
+    return { title: 'Crack the secret code', html: '<div class="code-key">' + key + '</div><div class="code-msg">' + words + '</div>' };
+  }
+
+  function squiggleSheet() {
+    const W = 460, H = 420; let x = R(120, 340), y = R(120, 300), d = 'M' + x + ' ' + y;
+    const n = R(2, 4);
+    for (let i = 0; i < n; i++) {
+      const nx = R(90, W - 90), ny = R(80, H - 80);
+      d += ' C' + R(60, W - 60) + ' ' + R(60, H - 60) + ' ' + R(60, W - 60) + ' ' + R(60, H - 60) + ' ' + nx + ' ' + ny;
+    }
+    return { title: 'Squiggle art', html: '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" role="img" aria-label="A squiggle to draw from"><rect x="2" y="2" width="' + (W - 4) + '" height="' + (H - 4) + '" rx="10" fill="none" stroke="#111" stroke-width="3"/><path d="' + d + '" fill="none" stroke="#111" stroke-width="5" stroke-linecap="round"/></svg><div class="write-line">My picture is a <i></i></div>' };
+  }
+
+  function dotsSheet() {
+    const n = 7, S = 60, P = 20; let c = '';
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) c += '<circle cx="' + (P + x * S) + '" cy="' + (P + y * S) + '" r="6" fill="#111"/>';
+    const W = P * 2 + (n - 1) * S;
+    return { title: 'Dots and boxes', html: '<svg viewBox="0 0 ' + W + ' ' + W + '" width="' + W + '" role="img" aria-label="Grid of dots">' + c + '</svg><div class="write-line" style="display:flex;gap:30px;flex-wrap:wrap;justify-content:center"><span>Me: ____ boxes</span><span>Grown-up: ____ boxes</span></div>' };
+  }
+
+  const SHEETS = {
+    maze: () => ({ title: 'Maze escape', html: mazeSVG() }),
+    words: wordSearch, sums: sumsSheet, hunt: huntSheet, code: codeSheet, squiggle: squiggleSheet, dots: dotsSheet
+  };
+
+  // ---------- state ----------
+  let cat = store.get('cat', 'all'); if (!CATS[cat]) cat = 'all';
+  let stars = store.get('stars', 0);
+  let recent = [];
+  let current = null, currentSheet = null, timerLeft = 0, timerId = null, claimed = false;
+
+  const LEVELS = [[0, 'Rookie'], [5, 'Explorer'], [15, 'Adventurer'], [30, 'Champion'], [50, 'Legend'], [100, 'Super Legend']];
+  function renderStars() {
+    $('starCount').textContent = stars;
+    let i = 0; while (i < LEVELS.length - 1 && stars >= LEVELS[i + 1][0]) i++;
+    const lo = LEVELS[i][0], hi = LEVELS[i + 1] ? LEVELS[i + 1][0] : lo;
+    $('levelName').textContent = LEVELS[i][1] + (LEVELS[i + 1] ? ' · ' + (hi - stars) + ' to ' + LEVELS[i + 1][1] : '');
+    $('levelBar').style.width = (hi > lo ? ((stars - lo) / (hi - lo)) * 100 : 100) + '%';
+    return LEVELS[i][1];
+  }
+
+
+  function choose() {
+    const idx = POOL.map((p, i) => i).filter(i => { const p = POOL[i]; const c = typeof p === 'function' ? null : p.cat; return cat === 'all' || (c ? c === cat : true); });
+    // functions: evaluate to find category
+    const options = [];
+    idx.forEach(i => { const p = POOL[i]; const o = typeof p === 'function' ? p() : Object.assign({}, p); if (cat === 'all' || o.cat === cat) options.push([i, o]); });
+    let fresh = options.filter(o => !recent.includes(o[0]));
+    if (!fresh.length) { recent = []; fresh = options; }
+    const [i, o] = pick(fresh);
+    recent.push(i); if (recent.length > Math.min(20, Math.floor(options.length * .7))) recent.shift();
+    return o;
+  }
+
+  function stopTimer() { clearInterval(timerId); timerId = null; $('timerBtn').querySelector('span').textContent = 'Start timer'; }
+  const fmt = s => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+
+  function show(o) {
+    current = o; claimed = false; stopTimer();
+    const card = $('card'); card.style.setProperty('--cc', CATS[o.cat].color);
+    $('badge').innerHTML = svgI(o.cat) + CATS[o.cat].label;
+    $('cTitle').textContent = o.title;
+    $('cText').textContent = o.text;
+    $('cNeed').hidden = !o.need; if (o.need) $('cNeed').innerHTML = '<b>You need:</b> ' + o.need;
+    $('cAnswer').hidden = true; $('cAnswer').textContent = o.answer || '';
+    $('answerBtn').hidden = !o.answer;
+    $('timerBtn').hidden = !o.timer; $('timer').hidden = !o.timer; $('timer').classList.remove('done');
+    if (o.timer) { timerLeft = o.timer; $('timer').textContent = fmt(timerLeft); $('timerBtn').querySelector('span').textContent = 'Start ' + (o.timer >= 60 ? fmt(o.timer).replace(':00', ' min') : o.timer + ' sec') + ' timer'; }
+    $('cheer').hidden = true;
+    $('doneBtn').disabled = false;
+    if (o.sheet) { buildSheet(o.sheet); $('printArea').hidden = false; } else { $('printArea').hidden = true; currentSheet = null; }
+  }
+
+  function buildSheet(kind) {
+    currentSheet = kind;
+    const s = SHEETS[kind]();
+    $('sheet').innerHTML = sheetTop() + '<h3>' + s.title + '</h3><p class="sub">' + current.text + '</p>' + s.html;
+  }
+
+  let spinning = false;
+  function newChallenge() {
+    if (spinning) return;
+    window.speechSynthesis && speechSynthesis.cancel();
+    const final = choose();
+    if (reduced) { show(final); return; }
+    spinning = true; $('card').classList.add('spin');
+    let n = 0; const steps = 7;
+    const tick = () => {
+      if (n++ < steps) {
+        const p = POOL[R(0, POOL.length - 1)], o = typeof p === 'function' ? p() : p;
+        $('cTitle').textContent = o.title; $('card').style.setProperty('--cc', CATS[o.cat].color);
+        $('badge').innerHTML = svgI(o.cat) + CATS[o.cat].label;
+        setTimeout(tick, 50 + n * 18);
+      } else { $('card').classList.remove('spin'); spinning = false; show(final); blip(660, .08); }
+    };
+    tick();
+  }
+  $('go').addEventListener('click', newChallenge);
+  $('newSheetBtn').addEventListener('click', () => currentSheet && buildSheet(currentSheet));
+
+  // ---------- sound ----------
+  let ac = null;
+  function blip(f, len, delay) {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      const t = ac.currentTime + (delay || 0), o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.25, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + len);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t + len + .05);
+    } catch (e) {}
+  }
+
+  // ---------- read aloud ----------
+  if (!('speechSynthesis' in window)) $('readBtn').hidden = true;
+  $('readBtn').addEventListener('click', () => {
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(current.title + '. ' + current.text + (current.need ? '. You need: ' + current.need + '.' : ''));
+      u.rate = .9; u.pitch = 1.1;
+      const v = speechSynthesis.getVoices().find(v => /en-AU/i.test(v.lang)) || speechSynthesis.getVoices().find(v => /^en/i.test(v.lang));
+      if (v) u.voice = v;
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  });
+
+  // ---------- timer ----------
+  $('timerBtn').addEventListener('click', () => {
+    if (timerId) { stopTimer(); return; }
+    if (timerLeft <= 0) timerLeft = current.timer;
+    $('timer').classList.remove('done'); $('timer').textContent = fmt(timerLeft);
+    $('timerBtn').querySelector('span').textContent = 'Pause timer';
+    blip(520, .1);
+    timerId = setInterval(() => {
+      timerLeft--; $('timer').textContent = fmt(Math.max(0, timerLeft));
+      if (timerLeft <= 3 && timerLeft > 0) blip(440, .08);
+      if (timerLeft <= 0) {
+        stopTimer(); $('timer').textContent = 'Time!'; $('timer').classList.add('done');
+        blip(784, .15); blip(988, .15, .18); blip(1175, .3, .36);
+        $('timerBtn').querySelector('span').textContent = 'Go again';
+      }
+    }, 1000);
+  });
+
+  $('answerBtn').addEventListener('click', () => { $('cAnswer').hidden = !$('cAnswer').hidden; });
+
+  // ---------- done ----------
+  const CHEERS = ['Awesome work!', 'You nailed it!', 'Super star!', 'Legend!', 'Way to go!', 'Too easy for you!', 'Champion effort!'];
+  $('doneBtn').addEventListener('click', () => {
+    if (claimed) return;
+    claimed = true; stopTimer();
+    const before = renderStars();
+    stars++; store.set('stars', stars);
+    const after = renderStars();
+    $('cheer').textContent = before !== after ? 'Level up! You are now a ' + after + '!' : pick(CHEERS) + ' +1 star';
+    $('cheer').hidden = false; $('doneBtn').disabled = true;
+    blip(523, .12); blip(659, .12, .12); blip(784, .25, .24);
+    confetti();
+  });
+
+  // ---------- print ----------
+  const inFrame = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
+  if (inFrame) $('printHint').hidden = false;
+  $('printBtn').addEventListener('click', () => { try { window.print(); } catch (e) {} if (inFrame) $('printHint').hidden = false; });
+
+  // ---------- confetti ----------
+  function confetti() {
+    if (reduced) return;
+    const cv = $('confetti'), ctx = cv.getContext('2d'), dpr = window.devicePixelRatio || 1;
+    cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; ctx.scale(dpr, dpr);
+    const cols = ['#F0533A', '#7A5CE0', '#2A8BE0', '#22A57D', '#E04F93', '#FFC83D'];
+    const ps = Array.from({ length: 140 }, () => ({ x: innerWidth / 2 + R(-60, 60), y: innerHeight * .55, vx: (Math.random() - .5) * 14, vy: -Math.random() * 16 - 6, s: R(6, 11), c: pick(cols), r: Math.random() * 6, vr: (Math.random() - .5) * .4 }));
+    let f = 0;
+    (function frame() {
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      ps.forEach(p => { p.vy += .45; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); ctx.restore(); });
+      if (f++ < 120) requestAnimationFrame(frame); else ctx.clearRect(0, 0, innerWidth, innerHeight);
+    })();
+  }
+
+  function renderChips() {
+    $('chips').innerHTML = Object.keys(CATS).map(k => '<button class="chip" data-k="' + k + '" aria-pressed="' + (k === cat) + '" style="--cc:' + CATS[k].color + '">' + svgI(k) + (k === 'all' ? 'Anything (random)' : CATS[k].label) + '</button>').join('');
+  }
+  $('chips').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    cat = b.dataset.k; store.set('cat', cat); recent = []; renderChips(); newChallenge();
+  });
+
+  renderChips(); renderStars(); show(choose());
+})();
+</script>
