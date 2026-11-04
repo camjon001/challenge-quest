@@ -142,6 +142,38 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
 .write-line { margin-top: 18px; font-size: 1.2rem; font-weight: 800; }
 .write-line i { display: inline-block; width: 60%; border-bottom: 3px solid var(--paper-ink); }
 
+.sheet-name { color: var(--paper-ink); }
+
+/* Weekly sticker chart */
+.week { background: var(--surface); border: 3px solid var(--line); border-radius: var(--radius); box-shadow: 6px 6px 0 var(--line); padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+.week-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 16px; flex-wrap: wrap; }
+.week h2 { font-family: var(--display); font-weight: 400; font-size: 1.7rem; line-height: 1.1; margin: 0; }
+.week-sum { font-weight: 800; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.day { border: 2px solid color-mix(in srgb, var(--ink) 25%, transparent); border-radius: 14px; padding: 6px 3px 8px; min-height: 120px; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.day.today { border: 3px solid var(--line); background: color-mix(in srgb, var(--sun) 25%, var(--surface)); }
+.day.future { opacity: .55; }
+.day-name { font-weight: 900; font-size: .8rem; text-transform: uppercase; letter-spacing: 1px; }
+.day-date { font-size: .8rem; color: var(--ink-soft); line-height: 1; }
+.stickers { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; margin-top: 2px; }
+.sticker { width: 26px; height: 26px; border-radius: 50%; background: var(--cc); display: grid; place-items: center; border: 2px solid var(--line); }
+.sticker svg { width: 14px; height: 14px; stroke: #fff; }
+.goal { display: flex; flex-direction: column; gap: 6px; }
+.goal-track { height: 16px; border: 2px solid var(--line); border-radius: 99px; overflow: hidden; background: var(--bg); }
+.goal-track i { display: block; height: 100%; background: var(--sun); transition: width .4s; }
+.goal-text { font-weight: 800; margin: 0; }
+.goal-text.won { font-family: var(--display); font-weight: 400; font-size: 1.35rem; color: var(--c-explore); }
+
+/* Grown-ups settings */
+.grownups { border: 2px dashed color-mix(in srgb, var(--ink) 40%, transparent); border-radius: 16px; padding: 12px 16px; }
+.grownups summary { font-weight: 900; cursor: pointer; }
+.settings { display: grid; gap: 14px; margin-top: 14px; }
+.settings label { display: flex; flex-direction: column; gap: 4px; font-weight: 800; font-size: .95rem; min-width: 0; }
+.settings input, .settings select { font: inherit; font-weight: 600; padding: 8px 10px; border: 2px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); width: 100%; max-width: 100%; }
+.settings .row { display: flex; gap: 10px 14px; flex-wrap: wrap; align-items: flex-end; }
+.settings .row label { flex: 1 1 220px; }
+.settings p { margin: 0; font-size: .9rem; color: var(--ink-soft); max-width: 60ch; }
+
 #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; width: 100%; height: 100%; }
 
 @media (max-width: 480px) {
@@ -149,6 +181,12 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
   .sheet { padding: 18px 12px; }
   .ws td { width: 1.9em; height: 1.9em; font-size: 1rem; }
   .sums { font-size: 1.3rem; gap: 18px 16px; }
+  .week { padding: 16px 12px; }
+  .days { gap: 3px; }
+  .day { min-height: 92px; border-radius: 10px; }
+  .day-name { font-size: .7rem; letter-spacing: 0; }
+  .sticker { width: 20px; height: 20px; border-width: 1.5px; }
+  .sticker svg { width: 11px; height: 11px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .go, .btn, .bar i { transition: none; }
@@ -207,6 +245,32 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
     <p class="hint" id="printHint" hidden></p>
     <div class="sheet" id="sheet"></div>
   </section>
+
+  <section class="week" id="week" aria-labelledby="weekTitle">
+    <div class="week-head"><h2 id="weekTitle">This week’s stickers</h2><span class="week-sum" id="weekSum"></span></div>
+    <div class="days" id="days"></div>
+    <div class="goal">
+      <div class="goal-track"><i id="goalBar" style="width:0%"></i></div>
+      <p class="goal-text" id="goalText"></p>
+    </div>
+  </section>
+
+  <details class="grownups" id="grownups">
+    <summary>Grown-ups: name, weekly reward and reading voice</summary>
+    <div class="settings">
+      <div class="row">
+        <label for="kidName">Child’s name (printed on sheets)<input id="kidName" type="text" maxlength="30" autocomplete="off" placeholder="Type his name"></label>
+        <label for="goalNum">Weekly sticker goal<input id="goalNum" type="number" inputmode="numeric" min="1" max="50" value="10"></label>
+      </div>
+      <label for="reward">Reward for reaching the goal<input id="reward" type="text" maxlength="60" placeholder="e.g. A trip to the park"></label>
+      <div class="row" id="voiceRow">
+        <label for="voiceSel">Reading voice<select id="voiceSel"></select></label>
+        <button class="btn" id="testVoice" type="button"><svg class="i" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>Test voice</button>
+      </div>
+      <p id="voiceTip">For a more natural voice on an iPad, open <b>Settings → Accessibility → Read &amp; Speak (or Spoken Content) → Voices → English</b>. Download a voice marked <b>Enhanced</b> or <b>Premium</b> (Karen and Lee are Australian). Then reload this page and pick it here.</p>
+      <p>These settings are saved on this device only and are never sent anywhere.</p>
+    </div>
+  </details>
 </div>
 <canvas id="confetti" aria-hidden="true"></canvas>
 
@@ -363,7 +427,9 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
   ];
 
   // ---------- printable sheets ----------
-  const sheetTop = () => '<div class="sh-top"><span>Challenge Quest</span><span>Name: ______________ &nbsp; Date: __________</span></div>';
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const kidName = () => (settings.name || '').trim();
+  const sheetTop = () => '<div class="sh-top"><span>Challenge Quest</span><span>Name: <b class="sheet-name">' + (esc(kidName()) || '______________') + '</b> &nbsp; Date: __________</span></div>';
 
   function mazeSVG() {
     const w = R(0, 1) ? 9 : 11, h = w === 9 ? 11 : 13, S = 40, P = 30;
@@ -469,6 +535,9 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
   // ---------- state ----------
   let cat = store.get('cat', 'all'); if (!CATS[cat]) cat = 'all';
   let stars = store.get('stars', 0);
+  const settings = Object.assign({ name: '', goal: 10, reward: '', voice: '' }, store.get('settings', {}));
+  const saveSettings = () => store.set('settings', settings);
+  let log = store.get('log', []); if (!Array.isArray(log)) log = [];
   let recent = [];
   let current = null, currentSheet = null, timerLeft = 0, timerId = null, claimed = false;
 
@@ -553,17 +622,86 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
   }
 
   // ---------- read aloud ----------
-  if (!('speechSynthesis' in window)) $('readBtn').hidden = true;
-  $('readBtn').addEventListener('click', () => {
+  // Pick the most natural installed voice: Premium/Enhanced/Neural voices first, novelty and compact voices last.
+  const hasSpeech = 'speechSynthesis' in window;
+  const NOVELTY = /(albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|fred|junior|ralph|kathy|grandma|grandpa|rocko|shelley|flo|reed|sandy|eddy)/i;
+  function scoreVoice(v) {
+    const n = v.name.toLowerCase(); let s = 0;
+    if (/en[-_]au/i.test(v.lang)) s += 4; else if (/en[-_](gb|nz|ie)/i.test(v.lang)) s += 3; else s += 1;
+    if (/premium/.test(n)) s += 12;
+    if (/enhanced/.test(n)) s += 10;
+    if (/natural|neural|online/.test(n)) s += 10;
+    if (/google/.test(n)) s += 6;
+    if (/siri/.test(n)) s += 6;
+    if (/compact|eloquence/.test(n)) s -= 6;
+    if (/karen|lee|catherine|matilda|serena|daniel|kate|samantha|ava|zoe|evan|nathan|allison|susan|natasha|william/.test(n)) s += 2;
+    return s;
+  }
+  let voices = [];
+  function loadVoices() {
+    if (!hasSpeech) return;
+    let all = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
+    const nice = all.filter(v => !NOVELTY.test(v.name));
+    if (nice.length) all = nice;
+    voices = all.sort((a, b) => scoreVoice(b) - scoreVoice(a));
+    const sel = $('voiceSel');
+    if (!voices.length) { sel.innerHTML = '<option value="">Device default</option>'; return; }
+    sel.innerHTML = voices.map(v => '<option value="' + esc(v.voiceURI) + '">' + esc(v.name) + ' (' + esc(v.lang) + ')</option>').join('');
+    sel.value = (voices.find(v => v.voiceURI === settings.voice) || voices[0]).voiceURI;
+  }
+  const chosenVoice = () => voices.find(v => v.voiceURI === settings.voice) || voices[0] || null;
+  const speechText = t => t.replace(/ − /g, ' minus ').replace(/ \+ /g, ' plus ').replace(/ = \?/g, ' equals what?').replace(/ = /g, ' equals ').replace(/\s{3,}/g, '. ').replace(/[“”]/g, '');
+  function speak(text) {
+    if (!hasSpeech) return;
     try {
       speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(current.title + '. ' + current.text + (current.need ? '. You need: ' + current.need + '.' : ''));
-      u.rate = .9; u.pitch = 1.1;
-      const v = speechSynthesis.getVoices().find(v => /en-AU/i.test(v.lang)) || speechSynthesis.getVoices().find(v => /^en/i.test(v.lang));
-      if (v) u.voice = v;
+      const u = new SpeechSynthesisUtterance(speechText(text));
+      const v = chosenVoice(); if (v) { u.voice = v; u.lang = v.lang; }
+      u.rate = .95; u.pitch = 1;
       speechSynthesis.speak(u);
     } catch (e) {}
+  }
+  if (!hasSpeech) { $('readBtn').hidden = true; $('voiceRow').hidden = true; $('voiceTip').hidden = true; }
+  else { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; setTimeout(loadVoices, 700); }
+  $('readBtn').addEventListener('click', () => speak(current.title + '. ' + current.text + (current.need ? '. You need: ' + current.need + '.' : '')));
+  $('voiceSel').addEventListener('change', e => { settings.voice = e.target.value; saveSettings(); });
+  $('testVoice').addEventListener('click', () => speak('Hi' + (kidName() ? ' ' + kidName() : '') + '! Are you ready for your next challenge?'));
+
+  // ---------- weekly sticker chart ----------
+  const pad = n => String(n).padStart(2, '0');
+  const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  function weekDays() {
+    const t = new Date(); t.setHours(12, 0, 0, 0);
+    const mon = new Date(t); mon.setDate(t.getDate() - ((t.getDay() + 6) % 7));
+    return Array.from({ length: 7 }, (_, i) => { const d = new Date(mon); d.setDate(mon.getDate() + i); return d; });
+  }
+  const weekTotal = () => { const keys = weekDays().map(ymd); return log.filter(e => keys.includes(e.d)).length; };
+  const goalNum = () => Math.max(1, Math.min(50, parseInt(settings.goal, 10) || 10));
+  function renderWeek() {
+    const days = weekDays(), today = ymd(new Date()), DN = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    $('days').innerHTML = days.map((d, i) => {
+      const k = ymd(d), items = log.filter(e => e.d === k);
+      const cls = k === today ? ' today' : (k > today ? ' future' : '');
+      return '<div class="day' + cls + '"><span class="day-name">' + DN[i] + '</span><span class="day-date">' + d.getDate() + '</span><div class="stickers">' +
+        items.map(e => { const c = ICON[e.c] ? e.c : 'all'; return '<span class="sticker" style="--cc:' + CATS[c].color + '" title="' + esc(e.t || '') + '">' + svgI(c) + '</span>'; }).join('') + '</div></div>';
+    }).join('');
+    const total = weekTotal(), goal = goalNum(), reward = (settings.reward || '').trim();
+    $('weekSum').textContent = total + (total === 1 ? ' sticker' : ' stickers') + ' of ' + goal;
+    $('goalBar').style.width = Math.min(100, total / goal * 100) + '%';
+    const gt = $('goalText');
+    if (total >= goal) { gt.className = 'goal-text won'; gt.textContent = 'Goal reached!' + (reward ? ' Reward: ' + reward : ' Ask a grown-up for your reward.'); }
+    else { gt.className = 'goal-text'; gt.textContent = (goal - total) + ' more ' + (goal - total === 1 ? 'sticker' : 'stickers') + ' to reach the goal' + (reward ? ' and win: ' + reward : '') + '.'; }
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) renderWeek(); });
+
+  // ---------- grown-up settings ----------
+  $('kidName').value = settings.name; $('goalNum').value = goalNum(); $('reward').value = settings.reward;
+  $('kidName').addEventListener('input', e => {
+    settings.name = e.target.value; saveSettings();
+    document.querySelectorAll('.sheet-name').forEach(n => { n.textContent = kidName() || '______________'; });
   });
+  $('goalNum').addEventListener('input', e => { const n = parseInt(e.target.value, 10); if (n > 0) { settings.goal = Math.min(50, n); saveSettings(); renderWeek(); } });
+  $('reward').addEventListener('input', e => { settings.reward = e.target.value; saveSettings(); renderWeek(); });
 
   // ---------- timer ----------
   $('timerBtn').addEventListener('click', () => {
@@ -593,7 +731,15 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
     const before = renderStars();
     stars++; store.set('stars', stars);
     const after = renderStars();
-    $('cheer').textContent = before !== after ? 'Level up! You are now a ' + after + '!' : pick(CHEERS) + ' +1 star';
+    const hadGoal = weekTotal() >= goalNum();
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 60);
+    log = log.filter(e => e.d >= ymd(cutoff));
+    log.push({ d: ymd(new Date()), c: current.cat, t: current.title }); store.set('log', log);
+    renderWeek();
+    const nm = kidName();
+    let msg = before !== after ? 'Level up! You are now a ' + after + '!' : pick(CHEERS).replace(/!$/, nm ? ', ' + nm + '!' : '!') + ' +1 sticker';
+    if (!hadGoal && weekTotal() >= goalNum()) msg = 'You reached your weekly goal' + (nm ? ', ' + nm : '') + '!';
+    $('cheer').textContent = msg;
     $('cheer').hidden = false; $('doneBtn').disabled = true;
     blip(523, .12); blip(659, .12, .12); blip(784, .25, .24);
     confetti();
@@ -644,6 +790,6 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
     cat = b.dataset.k; store.set('cat', cat); recent = []; renderChips(); newChallenge();
   });
 
-  renderChips(); renderStars(); show(choose());
+  renderChips(); renderStars(); renderWeek(); show(choose());
 })();
 </script>
