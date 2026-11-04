@@ -602,18 +602,21 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
   // ---------- print ----------
   const inFrame = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAppMode = window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches);
   function printHelp() {
     const h = $('printHint');
-    if (inFrame) h.innerHTML = 'Printing is switched off inside Claude. Open <b>camjon001.github.io/challenge-quest</b> in Chrome or Safari and print from there.';
+    if (isAppMode) h.innerHTML = '<b>Printing doesn’t work from the home-screen icon.</b> To print, open the <b>Safari</b> app, go to <b>camjon001.github.io/challenge-quest</b>, pick <b>Print</b> and press <b>Print this sheet</b>.';
+    else if (inFrame) h.innerHTML = 'Printing is switched off inside Claude. Open <b>camjon001.github.io/challenge-quest</b> in Chrome or Safari and print from there.';
     else if (isIOS) h.innerHTML = 'Printing didn’t open. In Safari, tap the <b>Share</b> button (the square with an arrow), then <b>Print</b>. Only the sheet will print.';
     else h.innerHTML = 'Printing didn’t open. Press <b>Cmd + P</b> on a Mac or <b>Ctrl + P</b> on Windows. Only the sheet will print.';
     h.hidden = false;
   }
-  if (inFrame) printHelp();
+  if (inFrame || isAppMode) printHelp();
   let printStarted = false;
   window.addEventListener('beforeprint', () => { printStarted = true; });
   $('printBtn').addEventListener('click', () => {
     printStarted = false;
+    if (isAppMode) { printHelp(); return; }
     try { window.print(); } catch (e) {}
     setTimeout(() => { if (!printStarted) printHelp(); }, 1000);
   });
