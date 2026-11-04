@@ -3,8 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Challenges">
 <meta name="theme-color" content="#E4F0FA">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}</style>
@@ -206,7 +204,7 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
       <button class="btn" id="printBtn"><svg class="i" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2"/><path d="M6 14h12v7H6z"/></svg>Print this sheet</button>
       <button class="btn" id="newSheetBtn"><svg class="i" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>Make a different one</button>
     </div>
-    <p class="hint" id="printHint" hidden>Printing is switched off in this online view. To print, open <b>challenge-quest.html</b> from your Google Drive “Activity Challenge” folder in Chrome or Safari, then press Print.</p>
+    <p class="hint" id="printHint" hidden></p>
     <div class="sheet" id="sheet"></div>
   </section>
 </div>
@@ -603,8 +601,22 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
 
   // ---------- print ----------
   const inFrame = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
-  if (inFrame) $('printHint').hidden = false;
-  $('printBtn').addEventListener('click', () => { try { window.print(); } catch (e) {} if (inFrame) $('printHint').hidden = false; });
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  function printHelp() {
+    const h = $('printHint');
+    if (inFrame) h.innerHTML = 'Printing is switched off inside Claude. Open <b>camjon001.github.io/challenge-quest</b> in Chrome or Safari and print from there.';
+    else if (isIOS) h.innerHTML = 'Printing didn’t open. In Safari, tap the <b>Share</b> button (the square with an arrow), then <b>Print</b>. Only the sheet will print.';
+    else h.innerHTML = 'Printing didn’t open. Press <b>Cmd + P</b> on a Mac or <b>Ctrl + P</b> on Windows. Only the sheet will print.';
+    h.hidden = false;
+  }
+  if (inFrame) printHelp();
+  let printStarted = false;
+  window.addEventListener('beforeprint', () => { printStarted = true; });
+  $('printBtn').addEventListener('click', () => {
+    printStarted = false;
+    try { window.print(); } catch (e) {}
+    setTimeout(() => { if (!printStarted) printHelp(); }, 1000);
+  });
 
   // ---------- confetti ----------
   function confetti() {
