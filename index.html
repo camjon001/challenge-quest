@@ -30,6 +30,7 @@
   --c-explore: #127552;
   --c-kind: #B02A6A;
   --c-print: #A15600;
+  --c-art: #0E7C86;
   --chip-bg: #FFFFFF;
   --paper: #FFFFFF;
   --paper-ink: #111111;
@@ -42,14 +43,14 @@
   :root:not([data-theme="light"]) {
     --bg: #0F1B2E; --surface: #182842; --ink: #EAF2FF; --ink-soft: #C9D6EC; --line: #EAF2FF;
     --chip-bg: #182842;
-    --c-move: #FF7A63; --c-make: #A28CFF; --c-brain: #5CAEFF; --c-explore: #3FCB9D; --c-kind: #FF7DB6; --c-print: #FFAA3D;
+    --c-move: #FF7A63; --c-make: #A28CFF; --c-brain: #5CAEFF; --c-explore: #3FCB9D; --c-kind: #FF7DB6; --c-print: #FFAA3D; --c-art: #4FD1DB;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0F1B2E; --surface: #182842; --ink: #EAF2FF; --ink-soft: #C9D6EC; --line: #EAF2FF;
   --chip-bg: #182842;
-  --c-move: #FF7A63; --c-make: #A28CFF; --c-brain: #5CAEFF; --c-explore: #3FCB9D; --c-kind: #FF7DB6; --c-print: #FFAA3D;
+  --c-move: #FF7A63; --c-make: #A28CFF; --c-brain: #5CAEFF; --c-explore: #3FCB9D; --c-kind: #FF7DB6; --c-print: #FFAA3D; --c-art: #4FD1DB;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -107,6 +108,7 @@ h1 span { color: var(--btn); }
 .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--line); }
 .btn svg { width: 20px; height: 20px; }
 .btn.yes { background: var(--yes); color: #fff; }
+.btn:disabled { opacity: .45; cursor: default; }
 .btn.yes svg { stroke: #fff; }
 .cheer { font-family: var(--display); font-size: 1.4rem; color: var(--c-explore); margin: 0; }
 .card p, .card h2 { color: var(--ink); }
@@ -143,6 +145,42 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
 .write-line i { display: inline-block; width: 60%; border-bottom: 3px solid var(--paper-ink); }
 
 .sheet-name { color: var(--paper-ink); }
+
+/* Mode tabs */
+.modes { display: flex; border: 3px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: 4px 4px 0 var(--line); background: var(--surface); }
+.mode { flex: 1 1 0; min-width: 0; border: 0; background: transparent; padding: 12px 10px; font-family: var(--display); font-size: clamp(1.1rem, 4.5vw, 1.4rem); display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: var(--ink); }
+.mode + .mode { border-left: 3px solid var(--line); }
+.mode svg { width: 26px; height: 26px; flex: none; }
+.mode[aria-selected="true"] { background: var(--sun); color: #13294B; }
+body[data-mode="art"] #chips, body[data-mode="art"] #go, body[data-mode="art"] #card, body[data-mode="art"] #printArea { display: none !important; }
+body:not([data-mode="art"]) #artArea { display: none !important; }
+
+/* Colour & Dots */
+.art { display: flex; flex-direction: column; gap: 14px; }
+.thumbs { display: flex; flex-wrap: wrap; gap: 8px; }
+.thumb { width: 72px; height: 72px; padding: 3px; border: 3px solid var(--line); border-radius: 14px; background: #fff; box-shadow: 0 3px 0 var(--line); }
+.thumb svg { width: 100%; height: 100%; display: block; }
+.thumb[aria-pressed="true"] { outline: 4px solid var(--c-art); outline-offset: 2px; }
+.art-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.tools { display: inline-flex; border: 3px solid var(--line); border-radius: 14px; overflow: hidden; flex: none; }
+.tool { border: 0; background: var(--surface); padding: 9px 14px; font-weight: 800; display: inline-flex; gap: 6px; align-items: center; color: var(--ink); }
+.tool + .tool { border-left: 3px solid var(--line); }
+.tool svg { width: 20px; height: 20px; }
+.tool[aria-pressed="true"] { background: var(--c-art); color: #fff; }
+.swatches { display: flex; flex-wrap: wrap; gap: 6px; }
+.swatch { width: 38px; height: 38px; border-radius: 50%; border: 3px solid var(--line); background: var(--sw); padding: 0; }
+.swatch[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--line); transform: scale(1.08); }
+.art-status { font-family: var(--display); font-size: 1.5rem; line-height: 1.2; margin: 0; min-height: 1.2em; }
+.art-sheet svg.board { width: 100%; max-width: 560px; height: auto; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.board .r { stroke: #111; stroke-width: 4; stroke-linejoin: round; cursor: pointer; }
+.board .ln { fill: none; stroke: #111; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.board .dot { fill: #111; pointer-events: none; }
+.board .num { font: 900 15px var(--body); fill: #111; stroke: #fff; stroke-width: 4px; paint-order: stroke; pointer-events: none; text-anchor: middle; dominant-baseline: central; }
+.board .dline { stroke: #111; stroke-width: 4; stroke-linecap: round; pointer-events: none; }
+.board .dot-hint { fill: none; stroke: #E88A12; stroke-width: 4; pointer-events: none; transform-box: fill-box; transform-origin: center; animation: hint 1s ease-in-out infinite; }
+@keyframes hint { 50% { transform: scale(1.4); opacity: .45; } }
+.board.done .dots { opacity: .3; }
+.board .crayon { fill: none; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
 
 /* Weekly sticker chart */
 .week { background: var(--surface); border: 3px solid var(--line); border-radius: var(--radius); box-shadow: 6px 6px 0 var(--line); padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
@@ -191,12 +229,20 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
 @media (prefers-reduced-motion: reduce) {
   .go, .btn, .bar i { transition: none; }
   .timer.done { animation: none; }
+  .board .dot-hint { animation: none; }
 }
 @media print {
   :root { padding: 0 !important; }
   body { background: #fff; padding: 0 !important; }
-  .wrap > *:not(#printArea), .sheet-actions, .hint, #confetti { display: none !important; }
-  #printArea { display: block !important; }
+  .wrap > *, .sheet-actions, .hint, #confetti { display: none !important; }
+  body:not([data-print="art"]) #printArea { display: block !important; }
+  body[data-print="art"] #artArea { display: block !important; }
+  #artArea > *:not(.art-sheet) { display: none !important; }
+  .art-sheet svg.board { width: 100%; max-width: 175mm; margin: 0 auto; }
+  .board .dot-hint { display: none; }
+  .print-blank .drawn { display: none; }
+  .print-blank .r { fill: #fff !important; }
+  .print-blank .dots { opacity: 1 !important; }
   .sheet { border: none; box-shadow: none; padding: 0; overflow: visible; }
   @page { margin: 14mm; }
 }
@@ -214,6 +260,11 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
       </div>
     </div>
   </header>
+
+  <nav class="modes" role="tablist" aria-label="Sections">
+    <button class="mode" id="modeChallenges" role="tab" aria-selected="true"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>Challenges</button>
+    <button class="mode" id="modeArt" role="tab" aria-selected="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-1-.8-1.4-.8-2.3 0-.9.7-1.6 1.6-1.6H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7.3" r="1.2"/><circle cx="14.6" cy="7.3" r="1.2"/></svg>Colour &amp; Dots</button>
+  </nav>
 
   <div class="chips" id="chips" role="group" aria-label="Pick a kind of challenge"></div>
 
@@ -244,6 +295,36 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
     </div>
     <p class="hint" id="printHint" hidden></p>
     <div class="sheet" id="sheet"></div>
+  </section>
+
+  <section class="art" id="artArea" aria-label="Colouring and connect the dots">
+    <div class="chips" id="artKinds" role="group" aria-label="Pick colouring or dots">
+      <button class="chip" data-kind="colour" aria-pressed="true" style="--cc:var(--c-art)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-1-.8-1.4-.8-2.3 0-.9.7-1.6 1.6-1.6H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7.3" r="1.2"/><circle cx="14.6" cy="7.3" r="1.2"/></svg>Colouring pages</button>
+      <button class="chip" data-kind="dots" aria-pressed="false" style="--cc:var(--c-art)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l13-1 1 13H6z" stroke-dasharray="2 3"/><circle cx="5" cy="6" r="1.8"/><circle cx="18" cy="5" r="1.8"/><circle cx="19" cy="18" r="1.8"/><circle cx="6" cy="18" r="1.8"/></svg>Connect the dots</button>
+    </div>
+    <div class="thumbs" id="thumbs"></div>
+    <div class="art-bar" id="colourTools">
+      <div class="tools" id="toolBtns">
+        <button class="tool" data-tool="fill" aria-pressed="true"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l7-7 7 7-7 7z"/><path d="M19 14s2 2.4 2 3.8a2 2 0 0 1-4 0c0-1.4 2-3.8 2-3.8z"/></svg>Fill</button>
+        <button class="tool" data-tool="crayon" aria-pressed="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l3-1 12-12-2-2L5 17z"/><path d="M15 5l4 4"/></svg>Crayon</button>
+      </div>
+      <div class="swatches" id="swatches" role="group" aria-label="Colours"></div>
+    </div>
+    <p class="art-status" id="artStatus" aria-live="polite"></p>
+    <div class="sheet art-sheet" id="artSheet">
+      <div id="artTop"></div>
+      <h3 id="artTitle"></h3>
+      <p class="sub" id="artSub"></p>
+      <svg class="board" id="board" viewBox="0 0 400 400" role="img" aria-label="Picture"></svg>
+    </div>
+    <div class="actions">
+      <button class="btn" id="artUndo"><svg class="i" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>Undo</button>
+      <button class="btn" id="artReset"><svg class="i" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>Start again</button>
+      <button class="btn" id="artPrint"><svg class="i" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2"/><path d="M6 14h12v7H6z"/></svg>Print</button>
+      <button class="btn yes" id="artFinish"><svg class="i" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>I finished it!</button>
+    </div>
+    <p class="cheer" id="artCheer" hidden></p>
+    <p class="hint" id="artHint" hidden></p>
   </section>
 
   <section class="week" id="week" aria-labelledby="weekTitle">
@@ -293,7 +374,8 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
     brain: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
     explore: '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l6 6"/>',
     kind: '<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>',
-    print: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>'
+    print: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>',
+    art: '<path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-1-.8-1.4-.8-2.3 0-.9.7-1.6 1.6-1.6H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7.3" r="1.2"/><circle cx="14.6" cy="7.3" r="1.2"/>'
   };
   const svgI = k => '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + ICON[k] + '</svg>';
   const CATS = {
@@ -303,7 +385,8 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
     brain: { label: 'Think', color: 'var(--c-brain)' },
     explore: { label: 'Explore', color: 'var(--c-explore)' },
     kind: { label: 'Kind', color: 'var(--c-kind)' },
-    print: { label: 'Print', color: 'var(--c-print)' }
+    print: { label: 'Print', color: 'var(--c-print)' },
+    art: { label: 'Colour', color: 'var(--c-art)' }
   };
 
   const ANIMALS = ['penguin', 'kangaroo', 'flamingo', 'frog', 'crab', 'snake', 'elephant', 'bunny', 'monkey', 'emu', 'koala', 'chicken', 'dinosaur', 'cat'];
@@ -369,6 +452,8 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
     () => ({ cat: 'make', title: 'Comic strip', text: 'Draw a 3-picture comic about a ' + pick(THINGS) + '. What happens first, next and last?', need: 'paper and pencils' }),
     { cat: 'make', title: 'Pattern maker', text: 'Make a pattern on the floor with 12 things from around the house. Like: spoon, sock, spoon, sock…' },
     { cat: 'make', title: 'Lego car ramp', text: 'Build a car and a ramp. Whose car rolls the furthest?', need: 'Lego and a book or board for a ramp' },
+    { cat: 'make', title: 'Colouring time', text: 'Tap Colour & Dots at the top and colour in a whole picture. Use at least 5 different colours!' },
+    { cat: 'brain', title: 'Dot detective', text: 'Tap Colour & Dots, choose Connect the dots and finish a mystery picture. Can you guess what it is before the last dot?' },
 
     // THINK
     () => { const n = R(15, 30); return { cat: 'brain', title: 'Count down', text: 'Count backwards from ' + n + ' all the way to zero. Then shout BLAST OFF!' }; },
@@ -725,47 +810,51 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
 
   // ---------- done ----------
   const CHEERS = ['Awesome work!', 'You nailed it!', 'Super star!', 'Legend!', 'Way to go!', 'Too easy for you!', 'Champion effort!'];
-  $('doneBtn').addEventListener('click', () => {
-    if (claimed) return;
-    claimed = true; stopTimer();
+  function award(cat, title) {
     const before = renderStars();
     stars++; store.set('stars', stars);
     const after = renderStars();
     const hadGoal = weekTotal() >= goalNum();
     const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 60);
     log = log.filter(e => e.d >= ymd(cutoff));
-    log.push({ d: ymd(new Date()), c: current.cat, t: current.title }); store.set('log', log);
+    log.push({ d: ymd(new Date()), c: cat, t: title }); store.set('log', log);
     renderWeek();
     const nm = kidName();
     let msg = before !== after ? 'Level up! You are now a ' + after + '!' : pick(CHEERS).replace(/!$/, nm ? ', ' + nm + '!' : '!') + ' +1 sticker';
     if (!hadGoal && weekTotal() >= goalNum()) msg = 'You reached your weekly goal' + (nm ? ', ' + nm : '') + '!';
-    $('cheer').textContent = msg;
-    $('cheer').hidden = false; $('doneBtn').disabled = true;
     blip(523, .12); blip(659, .12, .12); blip(784, .25, .24);
     confetti();
+    return msg;
+  }
+  $('doneBtn').addEventListener('click', () => {
+    if (claimed) return;
+    claimed = true; stopTimer();
+    $('cheer').textContent = award(current.cat, current.title);
+    $('cheer').hidden = false; $('doneBtn').disabled = true;
   });
 
   // ---------- print ----------
   const inFrame = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const isAppMode = window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches);
-  function printHelp() {
-    const h = $('printHint');
-    if (isAppMode) h.innerHTML = '<b>Printing doesn’t work from the home-screen icon.</b> To print, open the <b>Safari</b> app, go to <b>camjon001.github.io/challenge-quest</b>, pick <b>Print</b> and press <b>Print this sheet</b>.';
+  function printHelp(h) {
+    h = h || $('printHint');
+    if (isAppMode) h.innerHTML = '<b>Printing doesn’t work from the home-screen icon.</b> To print, open the <b>Safari</b> app, go to <b>camjon001.github.io/challenge-quest</b> and print from there.';
     else if (inFrame) h.innerHTML = 'Printing is switched off inside Claude. Open <b>camjon001.github.io/challenge-quest</b> in Chrome or Safari and print from there.';
     else if (isIOS) h.innerHTML = 'Printing didn’t open. In Safari, tap the <b>Share</b> button (the square with an arrow), then <b>Print</b>. Only the sheet will print.';
     else h.innerHTML = 'Printing didn’t open. Press <b>Cmd + P</b> on a Mac or <b>Ctrl + P</b> on Windows. Only the sheet will print.';
     h.hidden = false;
   }
-  if (inFrame || isAppMode) printHelp();
+  if (inFrame || isAppMode) { printHelp(); printHelp($('artHint')); }
   let printStarted = false;
   window.addEventListener('beforeprint', () => { printStarted = true; });
-  $('printBtn').addEventListener('click', () => {
+  function doPrint(h) {
     printStarted = false;
-    if (isAppMode) { printHelp(); return; }
+    if (isAppMode) { printHelp(h); return; }
     try { window.print(); } catch (e) {}
-    setTimeout(() => { if (!printStarted) printHelp(); }, 1000);
-  });
+    setTimeout(() => { if (!printStarted) printHelp(h); }, 1000);
+  }
+  $('printBtn').addEventListener('click', () => doPrint($('printHint')));
 
   // ---------- confetti ----------
   function confetti() {
@@ -783,13 +872,226 @@ svg.i { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: rou
   }
 
   function renderChips() {
-    $('chips').innerHTML = Object.keys(CATS).map(k => '<button class="chip" data-k="' + k + '" aria-pressed="' + (k === cat) + '" style="--cc:' + CATS[k].color + '">' + svgI(k) + (k === 'all' ? 'Anything (random)' : CATS[k].label) + '</button>').join('');
+    $('chips').innerHTML = Object.keys(CATS).filter(k => k !== 'art').map(k => '<button class="chip" data-k="' + k + '" aria-pressed="' + (k === cat) + '" style="--cc:' + CATS[k].color + '">' + svgI(k) + (k === 'all' ? 'Anything (random)' : CATS[k].label) + '</button>').join('');
   }
   $('chips').addEventListener('click', e => {
     const b = e.target.closest('.chip'); if (!b) return;
     cat = b.dataset.k; store.set('cat', cat); recent = []; renderChips(); newChallenge();
   });
 
+  // ---------- colour & dots: artwork (400 x 400; class "r" = fillable space, "ln" = line only) ----------
+  const NS = 'http://www.w3.org/2000/svg';
+  const BG = '<rect class="r" x="6" y="6" width="388" height="388" rx="14"/>';
+  const GROUND = y => '<path class="r" d="M6 ' + y + 'H394V380a14 14 0 0 1-14 14H20a14 14 0 0 1-14-14Z"/>';
+  const ptsStr = pts => pts.map(p => p.join(',')).join(' ');
+  const starPts = (cx, cy, R1, r1) => Array.from({ length: 10 }, (_, i) => { const a = (-90 + i * 36) * Math.PI / 180, rr = i % 2 ? r1 : R1; return [Math.round(cx + Math.cos(a) * rr), Math.round(cy + Math.sin(a) * rr)]; });
+  const starR = (cx, cy, s) => '<polygon class="r" points="' + ptsStr(starPts(cx, cy, s, s * .45)) + '"/>';
+  const f1 = n => n.toFixed(1);
+  const ring = (cx, cy, n, dist, el) => Array.from({ length: n }, (_, k) => { const a = k * 2 * Math.PI / n; return el(cx + Math.cos(a) * dist, cy + Math.sin(a) * dist, k * 360 / n); }).join('');
+  const CLOUD = (x, y) => '<path class="r" d="M' + x + ' ' + y + 'a20 20 0 0 1 22-26a28 28 0 0 1 52 2a20 20 0 0 1 8 38H' + (x + 6) + 'a18 18 0 0 1-6-14z"/>';
+  const littleFlower = (x, y) => '<rect class="r" x="' + (x - 5) + '" y="' + (y + 12) + '" width="10" height="' + (340 - y - 12) + '"/>' + ring(x, y, 5, 18, (a, b) => '<circle class="r" cx="' + f1(a) + '" cy="' + f1(b) + '" r="13"/>') + '<circle class="r" cx="' + x + '" cy="' + y + '" r="10"/>';
+
+  const PAGES = [
+    { name: 'House in the sun', art: BG + GROUND(320) + '<circle class="r" cx="330" cy="78" r="34"/><path class="ln" d="M330 30v-14M330 126v14M282 78h-14M378 78h10M296 44l-10-10M364 44l10-10M296 112l-10 10M364 112l10 10"/>' + CLOUD(50, 100) +
+      '<rect class="r" x="238" y="118" width="28" height="62"/><rect class="r" x="110" y="190" width="180" height="140"/><polygon class="r" points="90,198 200,104 310,198"/><circle class="r" cx="200" cy="162" r="15"/><rect class="r" x="178" y="255" width="44" height="75" rx="6"/><circle class="r" cx="212" cy="294" r="4"/><rect class="r" x="125" y="215" width="40" height="38"/><rect class="r" x="235" y="215" width="40" height="38"/><path class="ln" d="M145 215v38M125 234h40M255 215v38M235 234h40"/>' +
+      ring(55, 352, 5, 11, (a, b) => '<circle class="r" cx="' + f1(a) + '" cy="' + f1(b) + '" r="8"/>') + '<circle class="r" cx="55" cy="352" r="7"/>' + ring(345, 352, 5, 11, (a, b) => '<circle class="r" cx="' + f1(a) + '" cy="' + f1(b) + '" r="8"/>') + '<circle class="r" cx="345" cy="352" r="7"/>' },
+    { name: 'Happy fish', art: BG + '<path class="r" d="M6 350Q100 330 200 352T394 345V380a14 14 0 0 1-14 14H20a14 14 0 0 1-14-14Z"/><path class="r" d="M40 352C28 310 60 290 46 250C74 280 78 320 66 350Z"/><path class="r" d="M335 348C324 310 354 292 344 258C370 288 370 320 358 346Z"/>' +
+      '<polygon class="r" points="285,200 362,132 346,200 362,268"/><path class="r" d="M140 142Q190 66 252 142Z"/><path class="r" d="M168 256Q198 306 236 258Z"/><ellipse class="r" cx="190" cy="200" rx="116" ry="72"/><path class="r" d="M205 131Q232 200 205 269Q180 200 205 131Z"/><path class="r" d="M256 146Q274 200 256 254Q240 200 256 146Z"/><path class="ln" d="M122 158Q142 200 122 242"/><circle class="r" cx="104" cy="184" r="15"/><circle class="r" cx="100" cy="184" r="6"/><path class="ln" d="M80 218q12 9 24 0"/><circle class="r" cx="70" cy="112" r="12"/><circle class="r" cx="52" cy="78" r="8"/><circle class="r" cx="76" cy="52" r="6"/>' },
+    { name: 'Space rocket', art: BG + starR(70, 70, 18) + starR(330, 110, 14) + starR(90, 300, 12) + starR(60, 190, 10) + starR(345, 220, 9) +
+      '<circle class="r" cx="320" cy="320" r="42"/><ellipse class="ln" cx="320" cy="320" rx="64" ry="14" transform="rotate(-20 320 320)"/><path class="r" d="M168 268Q200 372 232 268Z"/><path class="r" d="M184 268Q200 332 216 268Z"/><path class="r" d="M152 188L104 272L152 256Z"/><path class="r" d="M248 188L296 272L248 256Z"/><path class="r" d="M200 44C246 84 252 160 250 270H150C148 160 154 84 200 44Z"/><path class="r" d="M200 44C218 60 230 82 238 109H162C170 82 182 60 200 44Z"/><circle class="r" cx="200" cy="170" r="27"/><circle class="r" cx="200" cy="170" r="16"/><rect class="r" x="194" y="214" width="12" height="56"/>' },
+    { name: 'Sunny flowers', art: BG + '<circle class="r" cx="70" cy="70" r="30"/>' + CLOUD(250, 80) + GROUND(330) + littleFlower(70, 245) + littleFlower(330, 260) +
+      '<rect class="r" x="193" y="190" width="14" height="150"/><ellipse class="r" cx="160" cy="282" rx="40" ry="16" transform="rotate(-25 160 282)"/><ellipse class="r" cx="240" cy="258" rx="40" ry="16" transform="rotate(25 240 258)"/>' +
+      ring(200, 140, 8, 50, (a, b, deg) => '<ellipse class="r" cx="' + f1(a) + '" cy="' + f1(b) + '" rx="34" ry="20" transform="rotate(' + deg + ' ' + f1(a) + ' ' + f1(b) + ')"/>') + '<circle class="r" cx="200" cy="140" r="32"/>' },
+    { name: 'Cool cat', art: BG + '<polygon class="r" points="95,150 110,40 185,110"/><polygon class="r" points="305,150 290,40 215,110"/><polygon class="r" points="113,125 120,70 160,108"/><polygon class="r" points="287,125 280,70 240,108"/><ellipse class="r" cx="200" cy="215" rx="135" ry="120"/>' +
+      '<ellipse class="r" cx="150" cy="195" rx="24" ry="30"/><ellipse class="r" cx="250" cy="195" rx="24" ry="30"/><ellipse class="r" cx="150" cy="200" rx="9" ry="20"/><ellipse class="r" cx="250" cy="200" rx="9" ry="20"/><ellipse class="r" cx="200" cy="268" rx="55" ry="38"/><path class="r" d="M186 246H214L200 262Z"/>' +
+      '<path class="ln" d="M200 262v14M200 276q-14 14-28 0M200 276q14 14 28 0M140 260L70 248M140 272L68 282M260 260L330 248M260 272L332 282"/><path class="r" d="M200 352L158 330V374Z"/><path class="r" d="M200 352L242 330V374Z"/><circle class="r" cx="200" cy="352" r="10"/>' },
+    { name: 'Race car', art: BG + '<circle class="r" cx="65" cy="70" r="30"/>' + CLOUD(250, 85) + GROUND(300) + '<path class="ln" d="M30 350h40M110 350h40M190 350h40M270 350h40M350 350h22"/>' +
+      '<path class="r" d="M120 192L160 130H262L302 192Z"/><path class="r" d="M140 190L168 145H205V190Z"/><path class="r" d="M215 190V145H256L282 190Z"/><path class="r" d="M55 250V206Q55 190 75 190H330Q355 190 355 215V250Q355 262 343 262H67Q55 262 55 250Z"/>' +
+      '<circle class="r" cx="340" cy="214" r="8"/><rect class="r" x="56" y="204" width="12" height="20"/><path class="ln" d="M210 192V255"/><rect class="r" x="222" y="208" width="20" height="7" rx="3"/><polygon class="r" points="110,215 150,215 135,240 95,240"/><circle class="r" cx="120" cy="262" r="34"/><circle class="r" cx="120" cy="262" r="14"/><circle class="r" cx="290" cy="262" r="34"/><circle class="r" cx="290" cy="262" r="14"/>' },
+    { name: 'Butterfly', art: BG + GROUND(340) + littleFlower(60, 300) + littleFlower(340, 305) +
+      '<path class="r" d="M195 190C150 60 40 50 50 130C55 180 120 200 195 200Z"/><path class="r" d="M205 190C250 60 360 50 350 130C345 180 280 200 205 200Z"/><path class="r" d="M195 205C120 205 70 260 100 300C130 335 180 290 195 225Z"/><path class="r" d="M205 205C280 205 330 260 300 300C270 335 220 290 205 225Z"/>' +
+      '<circle class="r" cx="110" cy="125" r="22"/><circle class="r" cx="290" cy="125" r="22"/><circle class="r" cx="160" cy="165" r="10"/><circle class="r" cx="240" cy="165" r="10"/><circle class="r" cx="135" cy="265" r="16"/><circle class="r" cx="265" cy="265" r="16"/>' +
+      '<path class="ln" d="M194 122Q176 84 160 70M206 122Q224 84 240 70"/><circle class="r" cx="160" cy="68" r="7"/><circle class="r" cx="240" cy="68" r="7"/><ellipse class="r" cx="200" cy="218" rx="12" ry="76"/><circle class="r" cx="200" cy="132" r="16"/>' },
+    { name: 'Friendly robot', art: BG + '<path class="ln" d="M200 75V48"/><circle class="r" cx="200" cy="40" r="10"/><rect class="r" x="118" y="105" width="20" height="36" rx="5"/><rect class="r" x="262" y="105" width="20" height="36" rx="5"/><rect class="r" x="135" y="75" width="130" height="95" rx="16"/>' +
+      '<circle class="r" cx="170" cy="114" r="15"/><circle class="r" cx="230" cy="114" r="15"/><circle class="r" cx="170" cy="114" r="6"/><circle class="r" cx="230" cy="114" r="6"/><rect class="r" x="165" y="140" width="70" height="16" rx="4"/><path class="ln" d="M182 140v16M200 140v16M218 140v16"/>' +
+      '<rect class="r" x="185" y="170" width="30" height="16"/><rect class="r" x="88" y="192" width="32" height="92" rx="12"/><rect class="r" x="280" y="192" width="32" height="92" rx="12"/><circle class="r" cx="104" cy="298" r="17"/><circle class="r" cx="296" cy="298" r="17"/>' +
+      '<rect class="r" x="140" y="312" width="40" height="52" rx="8"/><rect class="r" x="220" y="312" width="40" height="52" rx="8"/><rect class="r" x="128" y="358" width="62" height="22" rx="8"/><rect class="r" x="210" y="358" width="62" height="22" rx="8"/>' +
+      '<rect class="r" x="120" y="185" width="160" height="132" rx="14"/><rect class="r" x="150" y="205" width="100" height="62" rx="8"/><circle class="r" cx="172" cy="236" r="10"/><circle class="r" cx="200" cy="236" r="10"/><circle class="r" cx="228" cy="236" r="10"/><path class="r" d="M200 300l-12-11a7 7 0 0 1 12-7a7 7 0 0 1 12 7z"/>' }
+  ];
+
+  const heartPts = [[200, 118], [232, 78], [276, 62], [320, 78], [346, 120], [346, 168], [322, 216], [280, 264], [238, 308], [200, 346], [162, 308], [120, 264], [78, 216], [54, 168], [54, 120], [80, 78], [124, 62], [168, 78]];
+  const DOTS = [
+    { name: 'a house', pts: [[100, 340], [100, 190], [60, 190], [200, 80], [250, 119], [250, 88], [282, 88], [282, 144], [340, 190], [300, 190], [300, 340]], extras: '<rect class="r" x="178" y="268" width="44" height="72" rx="5"/><rect class="r" x="125" y="215" width="40" height="36"/><rect class="r" x="235" y="215" width="40" height="36"/>' },
+    { name: 'a fish', pts: [[60, 200], [110, 150], [180, 130], [250, 145], [300, 185], [350, 140], [338, 200], [350, 260], [300, 215], [250, 255], [180, 270], [110, 250]], extras: '<circle class="r" cx="100" cy="190" r="10"/><path class="ln" d="M140 165Q160 200 140 235"/>' },
+    { name: 'a star', pts: starPts(200, 212, 172, 70), extras: '<circle class="r" cx="178" cy="200" r="8"/><circle class="r" cx="222" cy="200" r="8"/><path class="ln" d="M176 232q24 20 48 0"/>' },
+    { name: 'a boat', pts: [[55, 250], [170, 250], [200, 60], [285, 250], [345, 250], [300, 320], [100, 320]], extras: '<path class="ln" d="M20 352q20-14 40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0t40 0"/><circle class="r" cx="150" cy="285" r="12"/><circle class="r" cx="200" cy="285" r="12"/><circle class="r" cx="250" cy="285" r="12"/>' },
+    { name: 'a heart', pts: heartPts, extras: '' },
+    { name: 'a rocket', pts: [[200, 40], [240, 100], [250, 240], [290, 300], [250, 290], [240, 320], [160, 320], [150, 290], [110, 300], [150, 240], [160, 100]], extras: '<circle class="r" cx="200" cy="160" r="24"/><circle class="r" cx="200" cy="160" r="13"/>' },
+    { name: 'an ice cream', pts: [[150, 200], [200, 360], [250, 200], [268, 168], [258, 128], [228, 102], [200, 96], [172, 102], [142, 128], [132, 168]], extras: '<path class="ln" d="M150 200Q175 215 200 200T250 200M168 225L222 300M196 225L228 270M232 225L178 300M204 225L172 270"/><circle class="r" cx="200" cy="80" r="14"/>' },
+    { name: 'a tree', pts: [[200, 40], [262, 130], [222, 130], [292, 220], [240, 220], [320, 310], [215, 310], [215, 360], [185, 360], [185, 310], [80, 310], [160, 220], [108, 220], [178, 130], [138, 130]], extras: '<circle class="r" cx="205" cy="105" r="8"/><circle class="r" cx="240" cy="195" r="9"/><circle class="r" cx="165" cy="190" r="9"/><circle class="r" cx="200" cy="260" r="10"/><circle class="r" cx="262" cy="288" r="9"/><circle class="r" cx="138" cy="288" r="9"/>' }
+  ];
+
+  // ---------- colour & dots: interaction ----------
+  let artKind = store.get('artKind', 'colour'); if (artKind !== 'dots') artKind = 'colour';
+  const artIdx = { colour: 0, dots: 0 };
+  let tool = 'fill', paint = '#E53935', undoStack = [], dotStep = 0, dotDone = false, artClaimed = false, drawing = null;
+  const SWATCHES = [['#E53935', 'red'], ['#FB8C00', 'orange'], ['#FDD835', 'yellow'], ['#43A047', 'green'], ['#1E88E5', 'blue'], ['#8E24AA', 'purple'], ['#EC407A', 'pink'], ['#8D6E63', 'brown'], ['#FFCC80', 'peach'], ['#90CAF9', 'sky blue'], ['#A5D6A7', 'light green'], ['#9E9E9E', 'grey'], ['#212121', 'black'], ['#FFFFFF', 'white']];
+  const board = $('board');
+  const centroid = pts => pts.reduce((a, p) => [a[0] + p[0] / pts.length, a[1] + p[1] / pts.length], [0, 0]);
+  function labelPos(p, c) {
+    let dx = p[0] - c[0], dy = p[1] - c[1]; const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
+    return [f1(Math.min(386, Math.max(14, p[0] + dx * 17))), f1(Math.min(388, Math.max(12, p[1] + dy * 17)))];
+  }
+  const whiten = root => root.querySelectorAll('.r').forEach(r => { if (!r.getAttribute('fill')) r.setAttribute('fill', '#fff'); });
+  const setArtStatus = t => { $('artStatus').textContent = t; };
+  const updateTouch = () => { board.style.touchAction = (tool === 'crayon' && (artKind === 'colour' || dotDone)) ? 'none' : 'manipulation'; };
+
+  function renderThumbs() {
+    const list = artKind === 'colour' ? PAGES : DOTS;
+    $('thumbs').innerHTML = list.map((p, i) => '<button class="thumb" data-i="' + i + '" aria-pressed="' + (i === artIdx[artKind]) + '" aria-label="' + (artKind === 'colour' ? esc(p.name) : 'Mystery dot-to-dot ' + (i + 1)) + '"><svg class="board" viewBox="0 0 400 400" aria-hidden="true">' +
+      (artKind === 'colour' ? p.art : p.pts.map(q => '<circle class="dot" cx="' + q[0] + '" cy="' + q[1] + '" r="13"/>').join('')) + '</svg></button>').join('');
+    whiten($('thumbs'));
+    document.querySelectorAll('#artKinds .chip').forEach(b => b.setAttribute('aria-pressed', b.dataset.kind === artKind));
+  }
+  function renderSwatches() {
+    $('swatches').innerHTML = SWATCHES.map(s => '<button class="swatch" data-c="' + s[0] + '" style="--sw:' + s[0] + '" aria-label="' + s[1] + '" aria-pressed="' + (s[0] === paint) + '"></button>').join('');
+  }
+  function setTool(t) { tool = t; document.querySelectorAll('.tool').forEach(b => b.setAttribute('aria-pressed', b.dataset.tool === t)); updateTouch(); }
+
+  function loadArt() {
+    undoStack = []; dotStep = 0; dotDone = false; artClaimed = false; drawing = null;
+    board.classList.remove('done'); $('artCheer').hidden = true;
+    $('artTop').innerHTML = sheetTop();
+    if (artKind === 'colour') {
+      const p = PAGES[artIdx.colour];
+      board.classList.remove('print-blank');
+      board.innerHTML = '<g class="art">' + p.art + '</g><g class="crayons"></g>';
+      $('artTitle').textContent = p.name;
+      $('artSub').textContent = 'Colour in the picture. Use your best colours!';
+      setArtStatus('Pick a colour, then tap a space to fill it.');
+      $('colourTools').hidden = false;
+    } else {
+      const d = DOTS[artIdx.dots], c = centroid(d.pts);
+      board.classList.add('print-blank');
+      board.innerHTML = '<rect class="r" x="6" y="6" width="388" height="388" rx="14"/><g class="shape drawn"></g><g class="lines drawn"></g><g class="art">' + d.extras + '</g><g class="crayons drawn"></g><g class="dots">' +
+        d.pts.map((p, i) => { const l = labelPos(p, c); return '<circle class="dot" cx="' + p[0] + '" cy="' + p[1] + '" r="5.5"/><text class="num" x="' + l[0] + '" y="' + l[1] + '">' + (i + 1) + '</text>'; }).join('') +
+        '</g><circle class="dot-hint" r="13" cx="' + d.pts[0][0] + '" cy="' + d.pts[0][1] + '"/>';
+      $('artTitle').textContent = 'Mystery dot-to-dot ' + (artIdx.dots + 1);
+      $('artSub').textContent = 'Join the dots from 1 to ' + d.pts.length + '. What will it be?';
+      setArtStatus('Tap dot 1 to start.');
+      $('colourTools').hidden = true;
+    }
+    whiten(board);
+    $('artFinish').disabled = artKind === 'dots';
+    updateTouch(); renderThumbs();
+  }
+
+  function svgPoint(e) {
+    const pt = board.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    const m = board.getScreenCTM(); return m ? pt.matrixTransform(m.inverse()) : { x: -999, y: -999 };
+  }
+  function addLine(a, b) {
+    const l = document.createElementNS(NS, 'line'); l.setAttribute('class', 'dline');
+    l.setAttribute('x1', a[0]); l.setAttribute('y1', a[1]); l.setAttribute('x2', b[0]); l.setAttribute('y2', b[1]);
+    board.querySelector('.lines').appendChild(l); return l;
+  }
+  function moveHint() {
+    const h = board.querySelector('.dot-hint'), q = DOTS[artIdx.dots].pts[dotStep];
+    if (h && q) { h.setAttribute('cx', q[0]); h.setAttribute('cy', q[1]); }
+  }
+  function tapDot(e) {
+    const d = DOTS[artIdx.dots];
+    if (dotStep >= d.pts.length) return;
+    const p = svgPoint(e), want = d.pts[dotStep];
+    let near = -1, best = 26;
+    d.pts.forEach((q, i) => { const dist = Math.hypot(q[0] - p.x, q[1] - p.y); if (dist < best) { best = dist; near = i; } });
+    if (Math.hypot(want[0] - p.x, want[1] - p.y) < 30) near = dotStep;
+    if (near < 0) return;
+    if (near !== dotStep) { setArtStatus('Oops! Look for number ' + (dotStep + 1) + '.'); blip(220, .12); return; }
+    const line = dotStep > 0 ? addLine(d.pts[dotStep - 1], want) : null;
+    undoStack.push({ t: 'dot', el: line });
+    dotStep++; blip(480 + dotStep * 22, .07);
+    if (dotStep === d.pts.length) { addLine(want, d.pts[0]); setArtStatus('Last one!'); setTimeout(finishDots, 400); }
+    else { setArtStatus(dotStep === 1 ? 'Now find 2.' : 'Great! Now find ' + (dotStep + 1) + '.'); moveHint(); }
+  }
+  function finishDots() {
+    const d = DOTS[artIdx.dots];
+    dotDone = true; board.classList.add('done');
+    const pg = document.createElementNS(NS, 'polygon');
+    pg.setAttribute('class', 'r'); pg.setAttribute('points', ptsStr(d.pts)); pg.setAttribute('fill', '#fff');
+    board.querySelector('.shape').appendChild(pg);
+    board.querySelector('.lines').innerHTML = '';
+    const h = board.querySelector('.dot-hint'); if (h) h.remove();
+    undoStack = [];
+    setArtStatus('You made ' + d.name + '! Now colour it in.');
+    speak('You made ' + d.name + '!');
+    $('colourTools').hidden = false; $('artFinish').disabled = false; updateTouch();
+    blip(523, .12); blip(659, .12, .12); blip(784, .25, .24); confetti();
+  }
+
+  board.addEventListener('pointerdown', e => {
+    if (artKind === 'dots' && !dotDone) { tapDot(e); return; }
+    if (tool === 'fill') {
+      const r = e.target.closest ? e.target.closest('.r') : null;
+      if (!r || !board.contains(r)) return;
+      const prev = r.getAttribute('fill'); if (prev === paint) return;
+      r.setAttribute('fill', paint); undoStack.push({ t: 'fill', el: r, prev }); blip(660, .05);
+      return;
+    }
+    e.preventDefault();
+    const p = svgPoint(e), path = document.createElementNS(NS, 'path');
+    path.setAttribute('class', 'crayon'); path.setAttribute('stroke', paint); path.setAttribute('stroke-width', '10');
+    const d0 = 'M' + f1(p.x) + ' ' + f1(p.y) + 'l0.1 0';
+    path.setAttribute('d', d0);
+    board.querySelector('.crayons').appendChild(path);
+    drawing = { path, d: d0, last: p, id: e.pointerId };
+    try { board.setPointerCapture(e.pointerId); } catch (err) {}
+    undoStack.push({ t: 'path', el: path });
+  });
+  board.addEventListener('pointermove', e => {
+    if (!drawing || e.pointerId !== drawing.id) return;
+    const p = svgPoint(e); if (Math.hypot(p.x - drawing.last.x, p.y - drawing.last.y) < 2) return;
+    drawing.d += 'L' + f1(p.x) + ' ' + f1(p.y); drawing.path.setAttribute('d', drawing.d); drawing.last = p;
+  });
+  const endDraw = () => { drawing = null; };
+  board.addEventListener('pointerup', endDraw); board.addEventListener('pointercancel', endDraw);
+
+  $('artUndo').addEventListener('click', () => {
+    const u = undoStack.pop(); if (!u) return;
+    if (u.t === 'fill') u.el.setAttribute('fill', u.prev);
+    else if (u.t === 'path') u.el.remove();
+    else if (u.t === 'dot') { if (u.el) u.el.remove(); dotStep--; moveHint(); setArtStatus(dotStep ? 'Now find ' + (dotStep + 1) + '.' : 'Tap dot 1 to start.'); }
+  });
+  $('artReset').addEventListener('click', loadArt);
+  $('artPrint').addEventListener('click', () => doPrint($('artHint')));
+  $('artFinish').addEventListener('click', () => {
+    if (artClaimed) return; artClaimed = true;
+    const title = artKind === 'colour' ? 'Coloured the ' + PAGES[artIdx.colour].name.toLowerCase() : 'Dot-to-dot: ' + DOTS[artIdx.dots].name;
+    $('artCheer').textContent = award('art', title); $('artCheer').hidden = false; $('artFinish').disabled = true;
+  });
+  $('thumbs').addEventListener('click', e => { const b = e.target.closest('.thumb'); if (!b) return; artIdx[artKind] = +b.dataset.i; loadArt(); });
+  $('artKinds').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; artKind = b.dataset.kind; store.set('artKind', artKind); loadArt(); });
+  $('toolBtns').addEventListener('click', e => { const b = e.target.closest('.tool'); if (b) setTool(b.dataset.tool); });
+  $('swatches').addEventListener('click', e => {
+    const b = e.target.closest('.swatch'); if (!b) return;
+    paint = b.dataset.c; document.querySelectorAll('.swatch').forEach(s => s.setAttribute('aria-pressed', s === b));
+  });
+
+  let artLoaded = false;
+  function setMode(m) {
+    m = m === 'art' ? 'art' : 'challenges';
+    store.set('mode', m);
+    document.body.dataset.mode = m;
+    document.body.dataset.print = m === 'art' ? 'art' : 'sheet';
+    $('modeChallenges').setAttribute('aria-selected', m !== 'art');
+    $('modeArt').setAttribute('aria-selected', m === 'art');
+    if (m === 'art' && !artLoaded) { artLoaded = true; loadArt(); }
+  }
+  $('modeChallenges').addEventListener('click', () => setMode('challenges'));
+  $('modeArt').addEventListener('click', () => setMode('art'));
+  renderSwatches(); setTool('fill');
+
   renderChips(); renderStars(); renderWeek(); show(choose());
+  setMode(store.get('mode', 'challenges'));
 })();
 </script>
