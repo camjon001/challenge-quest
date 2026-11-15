@@ -179,8 +179,9 @@ body:not([data-mode="art"]) #artArea { display: none !important; }
 .help-toggle { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; cursor: pointer; }
 .help-toggle input { width: 22px; height: 22px; accent-color: var(--c-art); margin: 0; }
 .swatch[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--line); transform: scale(1.08); }
-.art-status { font-family: var(--display); font-size: 1.5rem; line-height: 1.2; margin: 0; min-height: 1.2em; }
-.art-sheet svg.board { width: 100%; max-width: 560px; height: auto; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.art-status { font-family: var(--display); font-size: 1.5rem; line-height: 1.2; margin: 0; min-height: 1.2em; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 8px; }
+/* The picture always fits on screen (below the sticky instruction line), so every dot can be reached without scrolling. */
+.art-sheet svg.board { display: block; margin: 0 auto; width: min(100%, 560px, calc(100vh - 120px)); width: min(100%, 560px, calc(100svh - 120px)); height: auto; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 .board .r { stroke: #111; stroke-width: 4; stroke-linejoin: round; cursor: pointer; }
 .board .ln { fill: none; stroke: #111; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
 .board .dot { fill: #111; pointer-events: none; }
@@ -1241,7 +1242,11 @@ body:not([data-mode="art"]) #artArea { display: none !important; }
   }
 
   board.addEventListener('pointerdown', e => {
-    if (artKind === 'dots' && !dotDone) { startDotDrag(e); return; }
+    if (artKind === 'dots' && !dotDone) {
+      const r = board.getBoundingClientRect();
+      if (!dotDrag && (r.top < 0 || r.bottom > window.innerHeight + 2)) { showBoard(); setArtStatus('Here’s the whole picture. Start on dot ' + (joined + 1) + '.'); return; }
+      startDotDrag(e); return;
+    }
     const p = svgPoint(e);
     if (tool === 'fill') {
       const r = e.target.closest ? e.target.closest('.r') : null;
@@ -1296,7 +1301,14 @@ body:not([data-mode="art"]) #artArea { display: none !important; }
     const title = artKind === 'colour' ? 'Coloured the ' + PAGES[artIdx.colour].name.toLowerCase() : 'Dot-to-dot: ' + DOTS[artIdx.dots].name;
     $('artCheer').textContent = award('art', title); $('artCheer').hidden = false; $('artFinish').disabled = true;
   });
-  $('thumbs').addEventListener('click', e => { const b = e.target.closest('.thumb'); if (!b) return; artIdx[artKind] = +b.dataset.i; loadArt(); });
+  // Bring the whole picture on screen, just under the sticky instruction line.
+  function showBoard() {
+    requestAnimationFrame(() => {
+      const r = board.getBoundingClientRect(), top = $('artStatus').offsetHeight + 12;
+      if (r.top < top || r.bottom > window.innerHeight - 8) window.scrollBy({ top: r.top - top, behavior: reduced ? 'auto' : 'smooth' });
+    });
+  }
+  $('thumbs').addEventListener('click', e => { const b = e.target.closest('.thumb'); if (!b) return; artIdx[artKind] = +b.dataset.i; loadArt(); showBoard(); });
   $('artKinds').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; artKind = b.dataset.kind; store.set('artKind', artKind); loadArt(); });
   $('toolBtns').addEventListener('click', e => { const b = e.target.closest('.tool'); if (!b) return; tool = b.dataset.tool; updateToolUI(); });
   $('fillOpts').addEventListener('click', e => { const b = e.target.closest('.opt'); if (!b) return; fillStyle = b.dataset.fill; renderFillOpts(); });
