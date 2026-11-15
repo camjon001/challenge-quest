@@ -350,6 +350,7 @@ body:not([data-mode="art"]) #artArea { display: none !important; }
       </div>
       <p id="voiceTip">For a more natural voice on an iPad, open <b>Settings → Accessibility → Read &amp; Speak (or Spoken Content) → Voices → English</b>. Download a voice marked <b>Enhanced</b> or <b>Premium</b> (Karen and Lee are Australian). Then reload this page and pick it here.</p>
       <p>These settings are saved on this device only and are never sent anywhere.</p>
+      <p id="offlineStatus" hidden></p>
     </div>
   </details>
 </div>
@@ -1151,6 +1152,16 @@ body:not([data-mode="art"]) #artArea { display: none !important; }
   $('modeChallenges').addEventListener('click', () => setMode('challenges'));
   $('modeArt').addEventListener('click', () => setMode('art'));
   renderSwatches(); setTool('fill');
+
+  // ---------- offline play (only on the hosted site, where sw.js lives) ----------
+  if ('serviceWorker' in navigator && !inFrame && (location.protocol === 'https:' || location.hostname === '127.0.0.1')) {
+    const os = $('offlineStatus');
+    os.hidden = false; os.textContent = 'Getting offline play ready…';
+    navigator.serviceWorker.register('sw.js')
+      .then(() => navigator.serviceWorker.ready)
+      .then(() => { os.innerHTML = '<b>Offline play is ready.</b> This device has saved a copy, so it works without internet.'; })
+      .catch(() => { os.hidden = true; });
+  }
 
   renderChips(); renderStars(); renderWeek(); show(choose());
   setMode(store.get('mode', 'challenges'));
